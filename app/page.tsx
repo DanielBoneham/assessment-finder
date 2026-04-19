@@ -1,4 +1,4 @@
-import { getAssessors } from '@/lib/api'
+import { getAssessors, AssessorWithAvailability } from '@/lib/api'
 import { PageLayout, Container, Section } from '@/components/Layout'
 import { AssessorGrid } from '@/components/AssessorGrid'
 import { Button } from '@/components/Button'
