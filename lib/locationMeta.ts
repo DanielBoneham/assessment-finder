@@ -9,6 +9,7 @@ export interface LocationPageMeta {
   h1: string
   intro: string
   seoBody: string
+  seoExtra?: string
 }
 
 export function buildLocationMeta(
@@ -31,6 +32,7 @@ export function buildLocationMeta(
     h1: `${conditionLabel} Assessment in ${city}`,
     intro: `Private ${conditionLabel} assessors in ${city}, with real availability. All practitioners are registered with a recognised governing body.`,
     seoBody: SEO_BODY[condition](city),
+    seoExtra: SEO_EXTRA[condition] ? SEO_EXTRA[condition](city) : undefined,
   }
 }
 
@@ -72,5 +74,17 @@ A dyslexia assessment in ${city} identifies specific learning differences that a
 Private dyslexia assessments are commonly sought for school-age children, university students applying for DSA support, and adults in the workplace. A full diagnostic assessment results in a written report that can be used to access accommodations such as extra time in exams.
 
 Prices in ${city} typically range from £400 to £900. Assessment Finder lists qualified assessors with real availability so you can book without a long wait.
+  `.trim(),
+}
+
+const SEO_EXTRA: Partial<Record<Condition, (city: string) => string>> = {
+  adhd: (_city) => `
+Finding an ADHD assessment near you can be challenging due to long waiting times and limited availability.
+
+Many people start by searching online, but it can be difficult to tell which providers are currently accepting new patients.
+
+Key things to look for include qualifications, experience, and availability. Some assessors offer remote assessments, which can increase your options.
+
+Assessment Finder helps you search by location and see which professionals have availability in the near future.
   `.trim(),
 }
