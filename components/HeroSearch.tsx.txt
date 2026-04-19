@@ -1,0 +1,49 @@
+'use client'
+
+import { useState } from 'react'
+
+const CONDITIONS = ['ADHD', 'Autism', 'Dyslexia']
+
+export function HeroSearch() {
+  const [city, setCity] = useState('')
+  const [condition, setCondition] = useState('')
+
+  function handleSearch() {
+    const grid = document.getElementById('assessor-grid')
+    if (grid) {
+      grid.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+    window.dispatchEvent(new CustomEvent('hero-search', {
+      detail: { city, condition }
+    }))
+  }
+
+  return (
+    <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', maxWidth: '600px', margin: '0 auto', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+      <input
+        type="text"
+        placeholder="Enter your city (e.g. London)"
+        value={city}
+        onChange={(e) => setCity(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+        style={{ flex: 1, minWidth: '140px', height: '42px', border: '0.5px solid #d1d5db', borderRadius: '8px', padding: '0 12px', fontSize: '14px', fontFamily: 'inherit', color: '#111827' }}
+      />
+      <select
+        value={condition}
+        onChange={(e) => setCondition(e.target.value)}
+        style={{ flex: 1, minWidth: '140px', height: '42px', border: '0.5px solid #d1d5db', borderRadius: '8px', padding: '0 12px', fontSize: '14px', fontFamily: 'inherit', background: '#fff', color: '#111827' }}
+      >
+        <option value="">All conditions</option>
+        {CONDITIONS.map((c) => (
+          <option key={c} value={c}>{c}</option>
+        ))}
+      </select>
+      <button
+        onClick={handleSearch}
+        style={{ height: '42px', padding: '0 20px', background: '#1a3a5c', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}
+      >
+        Search
+      </button>
+    </div>
+  )
+}

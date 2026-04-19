@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { AssessorWithAvailability } from '@/lib/api'
 import { ProfileCard } from '@/components/ProfileCard'
 
@@ -23,6 +23,16 @@ export function AssessorGrid({ assessors }: AssessorGridProps) {
   const [city, setCity] = useState('')
   const [condition, setCondition] = useState('')
 
+  useEffect(() => {
+    function handleHeroSearch(e: Event) {
+      const { city: newCity, condition: newCondition } = (e as CustomEvent).detail
+      setCity(newCity || '')
+      setCondition(newCondition || '')
+    }
+    window.addEventListener('hero-search', handleHeroSearch)
+    return () => window.removeEventListener('hero-search', handleHeroSearch)
+  }, [])
+
   const cities = useMemo(
     () => [...new Set(assessors.map((a) => a.location_city))].sort(),
     [assessors]
@@ -30,7 +40,7 @@ export function AssessorGrid({ assessors }: AssessorGridProps) {
 
   const filtered = useMemo(() => {
     return assessors.filter((a) => {
-      const matchCity = !city || a.location_city === city
+      const matchCity = !city || a.location_city.toLowerCase().includes(city.toLowerCase())
       const matchCondition = !condition || a.conditions.includes(condition)
       return matchCity && matchCondition
     })
@@ -38,26 +48,17 @@ export function AssessorGrid({ assessors }: AssessorGridProps) {
 
   const hasFilters = !!(city || condition)
 
-  function handleCityChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setCity(e.target.value)
-  }
-
-  function handleConditionChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setCondition(e.target.value)
-  }
-
   function clearFilters() {
     setCity('')
     setCondition('')
   }
 
   return (
-    <div>
-      {/* Filter bar */}
+    <div id="assessor-grid">
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '1.5rem', alignItems: 'center' }}>
         <select
           value={city}
-          onChange={handleCityChange}
+          onChange={(e) => setCity(e.target.value)}
           style={selectStyle}
         >
           <option value="">All locations</option>
@@ -68,7 +69,7 @@ export function AssessorGrid({ assessors }: AssessorGridProps) {
 
         <select
           value={condition}
-          onChange={handleConditionChange}
+          onChange={(e) => setCondition(e.target.value)}
           style={selectStyle}
         >
           <option value="">All conditions</option>
@@ -88,7 +89,6 @@ export function AssessorGrid({ assessors }: AssessorGridProps) {
         </span>
       </div>
 
-      {/* Empty state */}
       {filtered.length === 0 && (
         <div style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '12px', padding: '2.5rem', textAlign: 'center' }}>
           <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
@@ -100,7 +100,6 @@ export function AssessorGrid({ assessors }: AssessorGridProps) {
         </div>
       )}
 
-      {/* Grid */}
       {filtered.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
           {filtered.map((assessor) => (

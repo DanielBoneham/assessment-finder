@@ -1,9 +1,8 @@
 import { getAssessors, AssessorWithAvailability } from '@/lib/api'
 import { PageLayout, Container, Section } from '@/components/Layout'
 import { AssessorGrid } from '@/components/AssessorGrid'
-import { Button } from '@/components/Button'
+import { HeroSearch } from '@/components/HeroSearch'
 
-// Runs on the server at request time — no loading states needed.
 export default async function HomePage() {
   let assessors: AssessorWithAvailability[] = []
   let error = false
@@ -26,23 +25,7 @@ export default async function HomePage() {
           <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', marginBottom: '2rem' }}>
             See who can assess you in the next few weeks
           </p>
-
-          <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', maxWidth: '600px', margin: '0 auto', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <input
-              type="text"
-              placeholder="Enter your city or postcode"
-              style={{ flex: 1, minWidth: '140px', height: '42px', border: '0.5px solid #d1d5db', borderRadius: '8px', padding: '0 12px', fontSize: '14px', fontFamily: 'inherit' }}
-            />
-            <select
-              style={{ flex: 1, minWidth: '140px', height: '42px', border: '0.5px solid #d1d5db', borderRadius: '8px', padding: '0 12px', fontSize: '14px', fontFamily: 'inherit', background: '#fff' }}
-            >
-              <option value="">All conditions</option>
-              <option>ADHD</option>
-              <option>Autism</option>
-              <option>Dyslexia</option>
-            </select>
-            <Button variant="primary" size="md">Search</Button>
-          </div>
+          <HeroSearch />
         </Container>
       </div>
 
@@ -75,4 +58,3 @@ export default async function HomePage() {
     </PageLayout>
   )
 }
-
