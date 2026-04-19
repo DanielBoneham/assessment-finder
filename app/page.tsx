@@ -17,52 +17,58 @@ export default async function HomePage() {
     <PageLayout>
 
       {/* Hero */}
-      <div style={{ background: '#1a3a5c', padding: '3rem 0 4rem' }}>
+      <div style={{ background: '#1a3a5c', padding: '3.5rem 0 4.5rem' }}>
         <Container style={{ textAlign: 'center' }}>
-          <h1 style={{ color: '#fff', fontSize: '28px', fontWeight: 500, lineHeight: 1.35, maxWidth: '560px', margin: '0 auto 0.75rem' }}>
-            Find ADHD, Autism &amp; Dyslexia Assessments with Real Availability
+          <h1 style={{ color: '#fff', fontSize: '32px', fontWeight: 500, lineHeight: 1.3, maxWidth: '600px', margin: '0 auto 1rem' }}>
+            Find Private ADHD, Autism &amp; Dyslexia Assessors Near You
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '16px', maxWidth: '480px', margin: '0 auto 2rem', lineHeight: 1.6 }}>
-            See which professionals can assess you in the next few weeks — no more guessing or long waiting lists.
+          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '16px', maxWidth: '500px', margin: '0 auto 2rem', lineHeight: 1.7 }}>
+            See who has availability in the next few weeks. Compare assessors, check credentials, and get in touch directly.
           </p>
           <HeroSearch />
+
+          {/* Proof bar */}
+          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '28px', marginTop: '2rem' }}>
+            {[
+              { value: '10+', label: 'Assessors listed' },
+              { value: 'Weekly', label: 'Availability updates' },
+              { value: 'Free', label: 'To search and contact' },
+            ].map((stat) => (
+              <div key={stat.label} style={{ textAlign: 'center' }}>
+                <p style={{ color: '#4ade80', fontSize: '20px', fontWeight: 500, margin: '0 0 2px' }}>{stat.value}</p>
+                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', margin: 0 }}>{stat.label}</p>
+              </div>
+            ))}
+          </div>
         </Container>
       </div>
 
-      {/* Assessor listing with filtering */}
+      {/* How it works */}
       <Section>
         <Container>
-          {error && (
-            <p style={{ color: '#991b1b', fontSize: '14px', background: '#fee2e2', padding: '1rem', borderRadius: '8px', marginBottom: '1.25rem' }}>
-              Could not load assessors. Please check your Supabase connection.
-            </p>
-          )}
-          {!error && <AssessorGrid assessors={assessors} />}
-        </Container>
-      </Section>
-
-      {/* SEO section */}
-      <Section style={{ paddingTop: 0 }}>
-        <Container>
-          <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
-            <h2 style={{ fontSize: '17px', fontWeight: 500, marginBottom: '1rem' }}>
-              ADHD assessment waiting times in the UK
-            </h2>
+          <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1.5rem', textAlign: 'center' }}>
+            How it works
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             {[
-              'ADHD assessment waiting times in the UK can vary significantly depending on whether you go through the NHS or a private provider.',
-              'NHS waiting times can often exceed 6–12 months in many areas. Private assessments are typically much faster, with availability ranging from a few weeks to a few months.',
-              'The time it takes to complete an assessment also varies, but most private ADHD assessments are completed within one to three appointments.',
-              'Because availability differs between providers, many people choose to compare assessors to find those with shorter waiting times.',
-              'Assessment Finder helps you identify ADHD assessors with current availability, so you can access support sooner.',
-            ].map((para, i, arr) => (
-              <p key={i} style={{ fontSize: '14px', color: '#6b7280', lineHeight: 1.8, marginBottom: i < arr.length - 1 ? '0.75rem' : 0 }}>
-                {para}
-              </p>
+              { step: '1', title: 'Search by location', body: 'Enter your city and select the type of assessment you need.' },
+              { step: '2', title: 'Compare availability', body: 'See which assessors have appointments coming up and how soon.' },
+              { step: '3', title: 'Contact directly', body: 'Send a message to the assessor and arrange your appointment.' },
+            ].map((item) => (
+              <div key={item.step} style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#e8f0fa', color: '#1a3a5c', fontSize: '14px', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                  {item.step}
+                </div>
+                <p style={{ fontSize: '15px', fontWeight: 500, color: '#111827', margin: '0 0 6px' }}>{item.title}</p>
+                <p style={{ fontSize: '14px', color: '#6b7280', margin: 0, lineHeight: 1.6 }}>{item.body}</p>
+              </div>
             ))}
           </div>
         </Container>
       </Section>
 
-    </PageLayout>
-  )
-}
+      {/* Assessor listing */}
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          {error && (
+            <p style={{ color: '#991b1b', fontSize: '14px', background: '#fee2e2', padding: '1rem', borderRadius: '8px', marginBottom: '1.25re
