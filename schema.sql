@@ -1,140 +1,166 @@
--- ============================================================
--- Assessment Finder – Supabase Schema
--- Run this in: Supabase Dashboard > SQL Editor > New Query
--- ============================================================
+import { notFound } from 'next/navigation'
+import { getAssessorById } from '@/lib/api'
+import { PageLayout, Container, Section } from '@/components/Layout'
+import { AvailabilityBadge } from '@/components/AvailabilityBadge'
+import { ContactForm } from '@/components/ContactForm'
 
+interface Props {
+  params: Promise<{ id: string }>
+}
 
--- ─── ASSESSORS ───────────────────────────────────────────────
+export default async function AssessorProfilePage({ params }: Props) {
+  const { id } = await params
+  const assessor = await getAssessorById(id)
+  if (!assessor) notFound()
 
-create table assessors (
-  id                uuid primary key default gen_random_uuid(),
-  name              text not null,
-  email             text unique not null,
-  location_city     text not null,
-  professional_title text not null,
-  governing_body    text,
-  registration_number text,
-  bio               text,
-  price_range       text,                     -- e.g. '£800 – £1,200'
-  conditions        text[] default '{}',      -- e.g. ARRAY['ADHD', 'Autism']
-  assessment_types  text[] default '{}',      -- e.g. ARRAY['Adults', 'Remote']
-  tier              text default 'free',      -- 'free' | 'featured'
-  is_verified       boolean default false,
-  created_at        timestamptz default now()
-);
+  const av = assessor.availability
+  const updatedAt = formatUpdatedAt(av?.last_updated)
+  const nextDate = av?.next_available_date ? formatDate(av.next_available_date) : null
 
+  return (
+    <PageLayout>
+      <div style={{ background: '#1a3a5c', padding: '2.5rem 0 3rem' }}>
+        <Container>
+          <a href="/" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', display: 'inline-block', marginBottom: '1.25rem' }}>
+            ← Back to all assessors
+          </a>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1.5rem' }}>
+            <div>
+              <h1 style={{ color: '#fff', fontSize: '26px', fontWeight: 500, margin: '0 0 4px' }}>
+                {assessor.name}
+              </h1>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', margin: '0 0 10px' }}>
+                {assessor.professional_title} · 📍 {assessor.location_city}
+              </p>
+              {assessor.is_verified && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(74,222,128,0.15)', color: '#4ade80', fontSize: '12px', fontWeight: 500, padding: '3px 10px', borderRadius: '20px', border: '0.5px solid rgba(74,222,128,0.3)' }}>
+                  ✓ Verified practitioner
+                </span>
+              )}
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1.25rem 1.5rem', minWidth: '200px' }}>
+              <p style={{ fontSize: '11px', fontWeight: 500, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 8px' }}>
+                Availability
+              </p>
+              {av ? (
+                <>
+                  <AvailabilityBadge range={av.availability_range} />
+                  {nextDate && (
+                    <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', margin: '8px 0 0' }}>
+                      Next available: <strong style={{ color: '#fff' }}>{nextDate}</strong>
+                    </p>
+                  )}
+                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '6px 0 0' }}>
+                    Updated {updatedAt}
+                  </p>
+                </>
+              ) : (
+                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>Not yet updated</p>
+              )}
+            </div>
+          </div>
+        </Container>
+      </div>
 
--- ─── AVAILABILITY ────────────────────────────────────────────
+      <Section>
+        <Container>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)', gap: '24px', alignItems: 'start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <Card title="Quick summary">
+                <ul style={{ margin: 0, paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <SummaryItem label="Conditions" value={assessor.conditions.join(', ')} />
+                  <SummaryItem label="Location" value={assessor.location_city} />
+                  <SummaryItem label="Assessment types" value={assessor.assessment_types.join(', ')} />
+                  {assessor.price_range && <SummaryItem label="Price range" value={assessor.price_range} />}
+                </ul>
+              </Card>
+              {assessor.bio && (
+                <Card title="About">
+                  <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.75, margin: 0 }}>{assessor.bio}</p>
+                </Card>
+              )}
+              <Card title="Assessment details">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {assessor.conditions.map((c) => <Tag key={c} label={c} />)}
+                  {assessor.assessment_types.map((t) => <Tag key={t} label={t} color="blue" />)}
+                </div>
+              </Card>
+              <Card title="Credentials">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {assessor.governing_body && <Row label="Governing body" value={assessor.governing_body} />}
+                  {assessor.registration_number && <Row label="Registration no." value={assessor.registration_number} />}
+                  <Row label="Verified" value={assessor.is_verified ? '✓ Yes — identity and credentials checked' : 'Not yet verified'} valueColor={assessor.is_verified ? '#166534' : '#6b7280'} />
+                </div>
+              </Card>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {assessor.price_range && (
+                <Card title="Price range">
+                  <p style={{ fontSize: '22px', fontWeight: 500, color: '#1a3a5c', margin: '0 0 6px' }}>{assessor.price_range}</p>
+                  <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>Prices are set by the assessor and may vary.</p>
+                </Card>
+              )}
+              <div style={{ position: 'sticky', top: '1rem' }}>
+                <Card title={`Contact ${assessor.name.split(' ')[0]}`}>
+                  <ContactForm assessorId={assessor.id} assessorName={assessor.name} />
+                </Card>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </Section>
+    </PageLayout>
+  )
+}
 
-create table availability (
-  id                  uuid primary key default gen_random_uuid(),
-  assessor_id         uuid not null references assessors(id) on delete cascade,
-  availability_range  text not null check (
-                        availability_range in (
-                          'within-2-weeks',
-                          '2-4-weeks',
-                          '1-3-months',
-                          '3-plus-months'
-                        )
-                      ),
-  next_available_date date,
-  last_updated        timestamptz default now()
-);
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
+      <h2 style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 1rem' }}>{title}</h2>
+      {children}
+    </div>
+  )
+}
 
+function SummaryItem({ label, value }: { label: string; value: string }) {
+  return (
+    <li style={{ fontSize: '14px', color: '#374151' }}>
+      <span style={{ color: '#9ca3af' }}>{label}:</span>{' '}
+      <span style={{ fontWeight: 500 }}>{value}</span>
+    </li>
+  )
+}
 
--- ─── LEADS ───────────────────────────────────────────────────
+function Row({ label, value, valueColor = '#111827' }: { label: string; value: string; valueColor?: string }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid #f3f4f6', paddingBottom: '10px', gap: '12px' }}>
+      <span style={{ fontSize: '13px', color: '#9ca3af', flexShrink: 0 }}>{label}</span>
+      <span style={{ fontSize: '13px', fontWeight: 500, color: valueColor, textAlign: 'right' }}>{value}</span>
+    </div>
+  )
+}
 
-create table leads (
-  id            uuid primary key default gen_random_uuid(),
-  assessor_id   uuid not null references assessors(id) on delete cascade,
-  name          text not null,
-  email         text not null,
-  message       text,
-  condition     text,
-  created_at    timestamptz default now()
-);
+function Tag({ label, color = 'navy' }: { label: string; color?: 'navy' | 'blue' }) {
+  const styles = {
+    navy: { background: '#e8f0fa', color: '#1a3a5c' },
+    blue: { background: '#eff6ff', color: '#1d4ed8' },
+  }
+  return (
+    <span style={{ ...styles[color], fontSize: '12px', padding: '4px 12px', borderRadius: '20px', fontWeight: 500 }}>
+      {label}
+    </span>
+  )
+}
 
+function formatUpdatedAt(timestamp?: string | null): string {
+  if (!timestamp) return 'recently'
+  const diff = Date.now() - new Date(timestamp).getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  if (days === 0) return 'today'
+  if (days === 1) return '1 day ago'
+  return `${days} days ago`
+}
 
--- ─── INDEXES (speeds up common queries) ──────────────────────
-
-create index on assessors (location_city);
-create index on assessors using gin (conditions);       -- fast array search
-create index on assessors using gin (assessment_types); -- fast array search
-create index on availability (assessor_id);
-create index on leads (assessor_id);
-
-
--- ─── ROW LEVEL SECURITY ──────────────────────────────────────
--- Locks down tables so only your app (service role) can write.
--- The public can read assessors + availability, but not leads.
-
-alter table assessors   enable row level security;
-alter table availability enable row level security;
-alter table leads        enable row level security;
-
--- Anyone can read assessors
-create policy "Public can read assessors"
-  on assessors for select
-  using (true);
-
--- Anyone can read availability
-create policy "Public can read availability"
-  on availability for select
-  using (true);
-
--- Anyone can submit a lead (contact form)
-create policy "Anyone can submit a lead"
-  on leads for insert
-  with check (true);
-
--- Only service role can read leads (you, in your dashboard)
-create policy "Service role can read leads"
-  on leads for select
-  using (auth.role() = 'service_role');
-
-
--- ─── SEED DATA (10 example assessors) ────────────────────────
-
-insert into assessors
-  (name, email, location_city, professional_title, bio, price_range, conditions, assessment_types, is_verified)
-values
-  ('Dr Sarah Mitchell',  'sarah.mitchell@example.com',  'London',     'Clinical Psychologist',     'Specialist in adult ADHD and autism assessments with 12 years experience.',   '£900 – £1,200', ARRAY['ADHD', 'Autism'],          ARRAY['Adults', 'Remote'],            true),
-  ('James Okafor',       'james.okafor@example.com',    'Manchester', 'Educational Psychologist',  'Expert in childhood dyslexia and learning difference assessments.',           '£600 – £800',   ARRAY['Dyslexia'],                  ARRAY['Children'],                    true),
-  ('Dr Priya Sharma',    'priya.sharma@example.com',    'Birmingham', 'Consultant Psychiatrist',   'Provides comprehensive ADHD and autism assessments for adults and children.', '£1,000 – £1,400',ARRAY['Autism', 'ADHD'],           ARRAY['Adults', 'Children'],          true),
-  ('Rachel Thornton',    'rachel.thornton@example.com', 'Bristol',    'Specialist Assessor',       'Remote and in-person dyslexia and ADHD assessments for all ages.',           '£500 – £750',   ARRAY['Dyslexia', 'ADHD'],          ARRAY['Adults', 'Children', 'Remote'],true),
-  ('Dr Marcus Webb',     'marcus.webb@example.com',     'Leeds',      'Clinical Psychologist',     'Focused on autism spectrum assessments and post-diagnostic support.',         '£850 – £1,100', ARRAY['Autism'],                    ARRAY['Adults'],                      true),
-  ('Amelia Grant',       'amelia.grant@example.com',    'Edinburgh',  'Educational Psychologist',  'Dyslexia and dyscalculia specialist working with schools and families.',      '£550 – £700',   ARRAY['Dyslexia'],                  ARRAY['Children', 'Remote'],          false),
-  ('Dr Kwame Asante',    'kwame.asante@example.com',    'London',     'Consultant Psychiatrist',   'Adult ADHD specialist offering fast-track assessments in central London.',    '£1,100 – £1,500',ARRAY['ADHD'],                     ARRAY['Adults'],                      true),
-  ('Sophie Harrington',  'sophie.h@example.com',        'Cardiff',    'Specialist Assessor',       'Assessment and support for ADHD and autism in children and teenagers.',       '£600 – £850',   ARRAY['ADHD', 'Autism'],            ARRAY['Children', 'Remote'],          false),
-  ('Dr Lena Fischer',    'lena.fischer@example.com',    'Glasgow',    'Clinical Psychologist',     'Experienced in adult autism diagnosis and cognitive assessments.',            '£800 – £1,050', ARRAY['Autism', 'Dyslexia'],        ARRAY['Adults', 'Remote'],            true),
-  ('Tom Beaumont',       'tom.beaumont@example.com',    'Nottingham', 'Educational Psychologist',  'Specialises in dyslexia screening and full diagnostic assessments.',          '£480 – £680',   ARRAY['Dyslexia'],                  ARRAY['Children', 'Adults'],          false);
-
-
--- Seed availability for each assessor
-insert into availability (assessor_id, availability_range, next_available_date)
-select id,
-  case name
-    when 'Dr Sarah Mitchell'  then 'within-2-weeks'
-    when 'James Okafor'       then 'within-2-weeks'
-    when 'Dr Priya Sharma'    then '1-3-months'
-    when 'Rachel Thornton'    then 'within-2-weeks'
-    when 'Dr Marcus Webb'     then '2-4-weeks'
-    when 'Amelia Grant'       then '2-4-weeks'
-    when 'Dr Kwame Asante'    then 'within-2-weeks'
-    when 'Sophie Harrington'  then '1-3-months'
-    when 'Dr Lena Fischer'    then '2-4-weeks'
-    when 'Tom Beaumont'       then '3-plus-months'
-  end,
-  case name
-    when 'Dr Sarah Mitchell'  then current_date + 10
-    when 'James Okafor'       then current_date + 7
-    when 'Dr Priya Sharma'    then current_date + 45
-    when 'Rachel Thornton'    then current_date + 5
-    when 'Dr Marcus Webb'     then current_date + 18
-    when 'Amelia Grant'       then current_date + 21
-    when 'Dr Kwame Asante'    then current_date + 9
-    when 'Sophie Harrington'  then current_date + 50
-    when 'Dr Lena Fischer'    then current_date + 16
-    when 'Tom Beaumont'       then current_date + 95
-  end
-from assessors;
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+}
