@@ -20,6 +20,7 @@ export function HeroSearch() {
 
   return (
     <div>
+      {/* Search bar */}
       <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', maxWidth: '600px', margin: '0 auto', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <input
           type="text"
@@ -47,19 +48,19 @@ export function HeroSearch() {
         </button>
       </div>
 
-      {/* How it works steps */}
+      {/* Proof strip */}
       <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '24px', marginTop: '1.5rem' }}>
         {[
-          { num: '1', text: 'Search by location and condition' },
-          { num: '2', text: 'See who is available sooner' },
-          { num: '3', text: 'Contact assessors directly' },
-        ].map((step) => (
-          <div key={step.num} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: '#fff', fontSize: '12px', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              {step.num}
+          { icon: '✓', text: '10 assessors across the UK' },
+          { icon: '✓', text: 'Availability updated regularly' },
+          { icon: '✓', text: 'Fastest availability: within 2 weeks' },
+        ].map((item) => (
+          <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+            <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(74,222,128,0.2)', color: '#4ade80', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              {item.icon}
             </span>
-            <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: '13px' }}>
-              {step.text}
+            <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px' }}>
+              {item.text}
             </span>
           </div>
         ))}
