@@ -45,18 +45,20 @@ export default async function HomePage() {
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
-            <h2 style={{ fontSize: '17px', fontWeight: 500, marginBottom: '0.75rem' }}>
-              Finding the right assessment in the UK
+            <h2 style={{ fontSize: '17px', fontWeight: 500, marginBottom: '1rem' }}>
+              ADHD assessment waiting times in the UK
             </h2>
-            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: 1.8, marginBottom: '0.75rem' }}>
-              ADHD, autism and dyslexia assessments in the UK can have long waiting times, often several months or more.
-            </p>
-            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: 1.8, marginBottom: '0.75rem' }}>
-              Assessment Finder helps you quickly identify professionals with shorter availability, so you can access support sooner.
-            </p>
-            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: 1.8, margin: 0 }}>
-              You can search by location, compare assessors, and see who is available in the next few weeks.
-            </p>
+            {[
+              'ADHD assessment waiting times in the UK can vary significantly depending on whether you go through the NHS or a private provider.',
+              'NHS waiting times can often exceed 6–12 months in many areas. Private assessments are typically much faster, with availability ranging from a few weeks to a few months.',
+              'The time it takes to complete an assessment also varies, but most private ADHD assessments are completed within one to three appointments.',
+              'Because availability differs between providers, many people choose to compare assessors to find those with shorter waiting times.',
+              'Assessment Finder helps you identify ADHD assessors with current availability, so you can access support sooner.',
+            ].map((para, i, arr) => (
+              <p key={i} style={{ fontSize: '14px', color: '#6b7280', lineHeight: 1.8, marginBottom: i < arr.length - 1 ? '0.75rem' : 0 }}>
+                {para}
+              </p>
+            ))}
           </div>
         </Container>
       </Section>
