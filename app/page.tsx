@@ -48,8 +48,14 @@ export default async function HomePage() {
             <h2 style={{ fontSize: '17px', fontWeight: 500, marginBottom: '0.75rem' }}>
               Finding the right assessment in the UK
             </h2>
-            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: 1.7 }}>
-              Getting assessed for ADHD, autism, or dyslexia can involve long NHS wait times — often 2–3 years. Private assessors can dramatically reduce this, with many offering appointments within weeks. Assessment Finder lists verified professionals across the UK and shows real availability, so you can make an informed choice quickly. All assessors are registered with a recognised governing body such as the BPS, HCPC, or GMC.
+            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+              ADHD, autism and dyslexia assessments in the UK can have long waiting times, often several months or more.
+            </p>
+            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+              Assessment Finder helps you quickly identify professionals with shorter availability, so you can access support sooner.
+            </p>
+            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: 1.8, margin: 0 }}>
+              You can search by location, compare assessors, and see who is available in the next few weeks.
             </p>
           </div>
         </Container>
