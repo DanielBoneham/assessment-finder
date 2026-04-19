@@ -22,7 +22,7 @@ export function HeroSearch() {
     <div style={{ background: '#fff', borderRadius: '12px', padding: '1.25rem', maxWidth: '600px', margin: '0 auto', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
       <input
         type="text"
-        placeholder="Enter your city (e.g. London)"
+        placeholder="Location"
         value={city}
         onChange={(e) => setCity(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -33,7 +33,7 @@ export function HeroSearch() {
         onChange={(e) => setCondition(e.target.value)}
         style={{ flex: 1, minWidth: '140px', height: '42px', border: '0.5px solid #d1d5db', borderRadius: '8px', padding: '0 12px', fontSize: '14px', fontFamily: 'inherit', background: '#fff', color: '#111827' }}
       >
-        <option value="">All conditions</option>
+        <option value="">Condition</option>
         {CONDITIONS.map((c) => (
           <option key={c} value={c}>{c}</option>
         ))}
@@ -42,7 +42,7 @@ export function HeroSearch() {
         onClick={handleSearch}
         style={{ height: '42px', padding: '0 20px', background: '#1a3a5c', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}
       >
-        Search
+        Find Assessors
       </button>
     </div>
   )

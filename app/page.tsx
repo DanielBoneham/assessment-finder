@@ -22,8 +22,8 @@ export default async function HomePage() {
           <h1 style={{ color: '#fff', fontSize: '28px', fontWeight: 500, lineHeight: 1.35, maxWidth: '560px', margin: '0 auto 0.75rem' }}>
             Find ADHD, Autism &amp; Dyslexia Assessments with Real Availability
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', marginBottom: '2rem' }}>
-            See who can assess you in the next few weeks
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '16px', maxWidth: '480px', margin: '0 auto 2rem', lineHeight: 1.6 }}>
+            See which professionals can assess you in the next few weeks — no more guessing or long waiting lists.
           </p>
           <HeroSearch />
         </Container>
