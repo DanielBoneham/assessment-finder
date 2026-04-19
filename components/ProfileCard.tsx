@@ -1,3 +1,5 @@
+'use client'
+
 import { AvailabilityBadge } from './AvailabilityBadge'
 import { Button } from './Button'
 
@@ -15,7 +17,22 @@ interface ProfileCardProps {
   conditions: string[]
   availability: AvailabilityRange
   updatedAt: string
-  href?: string // link to profile page
+  href?: string
+}
+
+function idToSeed(id: string): number {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash << 5) - hash + id.charCodeAt(i)
+    hash |= 0
+  }
+  return Math.abs(hash) % 70 + 1
+}
+
+function getPhotoUrl(id: string): string {
+  const seed = idToSeed(id)
+  const gender = seed % 2 === 0 ? 'women' : 'men'
+  return `https://randomuser.me/api/portraits/${gender}/${seed}.jpg`
 }
 
 export function ProfileCard({
@@ -28,6 +45,8 @@ export function ProfileCard({
   updatedAt,
   href,
 }: ProfileCardProps) {
+  const photoUrl = getPhotoUrl(id)
+
   return (
     <div
       style={{
@@ -40,22 +59,33 @@ export function ProfileCard({
         gap: '10px',
       }}
     >
-      {/* Name + title */}
-      <div>
-        <p style={{ fontSize: '15px', fontWeight: 500, color: '#111827', margin: 0 }}>
-          {name}
-        </p>
-        <p style={{ fontSize: '13px', color: '#6b7280', margin: '2px 0 0' }}>
-          {title}
-        </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <img
+          src={photoUrl}
+          alt={name}
+          style={{
+            width: '52px',
+            height: '52px',
+            borderRadius: '50%',
+            objectFit: 'cover',
+            flexShrink: 0,
+            border: '0.5px solid #d1dce8',
+          }}
+        />
+        <div>
+          <p style={{ fontSize: '15px', fontWeight: 500, color: '#111827', margin: 0 }}>
+            {name}
+          </p>
+          <p style={{ fontSize: '13px', color: '#6b7280', margin: '2px 0 0' }}>
+            {title}
+          </p>
+        </div>
       </div>
 
-      {/* Location */}
       <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>
         📍 {location}
       </p>
 
-      {/* Condition tags */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
         {conditions.map((condition) => (
           <span
@@ -73,10 +103,8 @@ export function ProfileCard({
         ))}
       </div>
 
-      {/* Availability */}
       <AvailabilityBadge range={availability} updatedAt={updatedAt} />
 
-      {/* CTA */}
       <Button
         variant="secondary"
         size="sm"

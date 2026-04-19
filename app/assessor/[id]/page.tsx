@@ -5,11 +5,12 @@ import { AvailabilityBadge } from '@/components/AvailabilityBadge'
 import { ContactForm } from '@/components/ContactForm'
 
 interface Props {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default async function AssessorProfilePage({ params }: Props) {
-  const assessor = await getAssessorById(params.id)
+  const { id } = await params
+  const assessor = await getAssessorById(id)
   if (!assessor) notFound()
 
   const av = assessor.availability
