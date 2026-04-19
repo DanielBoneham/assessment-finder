@@ -44,9 +44,9 @@ const AVAILABILITY_COLORS: Record<AvailabilityRange, { bg: string; text: string;
 
 const AVAILABILITY_LABELS: Record<AvailabilityRange, string> = {
   'within-2-weeks': 'Within 2 weeks',
-  '2-4-weeks':      '2–4 weeks',
-  '1-3-months':     '1–3 months',
-  '3-plus-months':  '3+ months',
+  '2-4-weeks':      '2 to 4 weeks',
+  '1-3-months':     '1 to 3 months',
+  '3-plus-months':  '3 or more months',
 }
 
 export function ProfileCard({
@@ -64,30 +64,40 @@ export function ProfileCard({
   const avLabel = AVAILABILITY_LABELS[availability]
 
   return (
-    <div
-      style={{
-        background: '#ffffff',
-        borderRadius: '12px',
-        border: '0.5px solid #d1dce8',
-        padding: '1.25rem',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-      }}
-    >
-      {/* Photo + Name */}
+    <div style={{ background: '#ffffff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <img
-          src={photoUrl}
-          alt={name}
-          style={{ width: '52px', height: '52px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '0.5px solid #d1dce8' }}
-        />
+        <img src={photoUrl} alt={name} style={{ width: '52px', height: '52px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '0.5px solid #d1dce8' }} />
         <div>
           <p style={{ fontSize: '15px', fontWeight: 500, color: '#111827', margin: 0 }}>{name}</p>
           <p style={{ fontSize: '13px', color: '#6b7280', margin: '2px 0 0' }}>{title}</p>
         </div>
       </div>
 
-      {/* Availability — prominent */}
       <div style={{ background: avColor.bg, borderRadius: '8px', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ width: '8px', height: '8px
+        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: avColor.dot, flexShrink: 0 }} />
+        <div>
+          <p style={{ fontSize: '13px', fontWeight: 700, color: avColor.text, margin: 0 }}>{avLabel}</p>
+          <p style={{ fontSize: '11px', color: avColor.text, margin: '1px 0 0', opacity: 0.75 }}>Updated {updatedAt}</p>
+        </div>
+      </div>
+
+      <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>
+        {location}
+      </p>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+        {conditions.map((condition) => (
+          <span key={condition} style={{ background: '#e8f0fa', color: '#1a3a5c', fontSize: '12px', padding: '3px 10px', borderRadius: '20px' }}>
+            {condition}
+          </span>
+        ))}
+      </div>
+
+      <Button variant="secondary" size="sm" fullWidth onClick={() => { if (href) window.location.href = href }} style={{ marginTop: 'auto' }}>
+        View profile
+      </Button>
+
+    </div>
+  )
+}
