@@ -47,16 +47,21 @@ export function HeroSearch() {
         </button>
       </div>
 
-      {/* Trust signals */}
-      <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '20px', marginTop: '1.25rem' }}>
+      {/* How it works steps */}
+      <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '24px', marginTop: '1.5rem' }}>
         {[
-          '50+ assessors across the UK',
-          'Availability updated regularly',
-          'Fastest availability: within 2 weeks',
-        ].map((text) => (
-          <span key={text} style={{ color: 'rgba(255,255,255,0.75)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: '#4ade80', fontWeight: 700 }}>✔</span> {text}
-          </span>
+          { num: '1', text: 'Search by location and condition' },
+          { num: '2', text: 'See who is available sooner' },
+          { num: '3', text: 'Contact assessors directly' },
+        ].map((step) => (
+          <div key={step.num} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: '#fff', fontSize: '12px', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              {step.num}
+            </span>
+            <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: '13px' }}>
+              {step.text}
+            </span>
+          </div>
         ))}
       </div>
     </div>
