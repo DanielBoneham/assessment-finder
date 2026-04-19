@@ -1,6 +1,5 @@
 'use client'
 
-import { AvailabilityBadge } from './AvailabilityBadge'
 import { Button } from './Button'
 
 type AvailabilityRange =
@@ -35,18 +34,11 @@ function getPhotoUrl(id: string): string {
   return `https://randomuser.me/api/portraits/${gender}/${seed}.jpg`
 }
 
-const AVAILABILITY_COLORS: Record<AvailabilityRange, { bg: string; text: string; dot: string }> = {
-  'within-2-weeks': { bg: '#dcfce7', text: '#166534', dot: '#22c55e' },
-  '2-4-weeks':      { bg: '#dcfce7', text: '#166534', dot: '#22c55e' },
-  '1-3-months':     { bg: '#fef3c7', text: '#92400e', dot: '#f59e0b' },
-  '3-plus-months':  { bg: '#fee2e2', text: '#991b1b', dot: '#ef4444' },
-}
-
-const AVAILABILITY_LABELS: Record<AvailabilityRange, string> = {
-  'within-2-weeks': 'Within 2 weeks',
-  '2-4-weeks':      '2 to 4 weeks',
-  '1-3-months':     '1 to 3 months',
-  '3-plus-months':  '3 or more months',
+const AVAILABILITY_CONFIG: Record<AvailabilityRange, { label: string; bg: string; text: string; dot: string }> = {
+  'within-2-weeks': { label: 'Available within 2 weeks', bg: '#dcfce7', text: '#166534', dot: '#22c55e' },
+  '2-4-weeks':      { label: 'Available in 2 to 4 weeks', bg: '#dcfce7', text: '#166534', dot: '#22c55e' },
+  '1-3-months':     { label: 'Available in 1 to 3 months', bg: '#fef3c7', text: '#92400e', dot: '#f59e0b' },
+  '3-plus-months':  { label: 'Available in 3 or more months', bg: '#fee2e2', text: '#991b1b', dot: '#ef4444' },
 }
 
 export function ProfileCard({
@@ -60,32 +52,39 @@ export function ProfileCard({
   href,
 }: ProfileCardProps) {
   const photoUrl = getPhotoUrl(id)
-  const avColor = AVAILABILITY_COLORS[availability]
-  const avLabel = AVAILABILITY_LABELS[availability]
+  const av = AVAILABILITY_CONFIG[availability]
 
   return (
     <div style={{ background: '#ffffff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
+      {/* Availability — top, most prominent */}
+      <div style={{ background: av.bg, borderRadius: '8px', padding: '12px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+          <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: av.dot, flexShrink: 0 }} />
+          <p style={{ fontSize: '15px', fontWeight: 700, color: av.text, margin: 0 }}>
+            {av.label}
+          </p>
+        </div>
+        <p style={{ fontSize: '12px', color: av.text, margin: '0 0 0 17px', opacity: 0.75 }}>
+          Updated {updatedAt}
+        </p>
+      </div>
+
+      {/* Photo + Name */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <img src={photoUrl} alt={name} style={{ width: '52px', height: '52px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '0.5px solid #d1dce8' }} />
+        <img src={photoUrl} alt={name} style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '0.5px solid #d1dce8' }} />
         <div>
           <p style={{ fontSize: '15px', fontWeight: 500, color: '#111827', margin: 0 }}>{name}</p>
           <p style={{ fontSize: '13px', color: '#6b7280', margin: '2px 0 0' }}>{title}</p>
         </div>
       </div>
 
-      <div style={{ background: avColor.bg, borderRadius: '8px', padding: '10px 12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: avColor.dot, flexShrink: 0 }} />
-        <div>
-          <p style={{ fontSize: '13px', fontWeight: 700, color: avColor.text, margin: 0 }}>{avLabel}</p>
-          <p style={{ fontSize: '11px', color: avColor.text, margin: '1px 0 0', opacity: 0.75 }}>Updated {updatedAt}</p>
-        </div>
-      </div>
-
+      {/* Location */}
       <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>
         {location}
       </p>
 
+      {/* Condition tags */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
         {conditions.map((condition) => (
           <span key={condition} style={{ background: '#e8f0fa', color: '#1a3a5c', fontSize: '12px', padding: '3px 10px', borderRadius: '20px' }}>
@@ -94,6 +93,7 @@ export function ProfileCard({
         ))}
       </div>
 
+      {/* CTA */}
       <Button variant="secondary" size="sm" fullWidth onClick={() => { if (href) window.location.href = href }} style={{ marginTop: 'auto' }}>
         View profile
       </Button>
