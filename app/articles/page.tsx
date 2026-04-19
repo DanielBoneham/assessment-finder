@@ -10,7 +10,6 @@ export default function ArticlesPage() {
   return (
     <PageLayout>
 
-      {/* Hero */}
       <div style={{ background: '#1a3a5c', padding: '2.5rem 0 3rem' }}>
         <Container>
           <h1 style={{ color: '#fff', fontSize: '26px', fontWeight: 500, margin: '0 0 8px' }}>
@@ -22,17 +21,12 @@ export default function ArticlesPage() {
         </Container>
       </div>
 
-      {/* Article list */}
       <Section>
         <Container>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {ARTICLES.map((article) => (
-              
-                key={article.slug}
-                href={`/articles/${article.slug}`}
-                style={{ textDecoration: 'none' }}
-              >
-                <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem', transition: 'border-color 0.15s' }}>
+              <a key={article.slug} href={`/articles/${article.slug}`} style={{ textDecoration: 'none' }}>
+                <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
                   <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                     {formatDate(article.publishedDate)}
                   </p>

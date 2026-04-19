@@ -48,11 +48,10 @@ export default async function LocationPage({ params }: Props) {
   return (
     <PageLayout>
 
-      {/* Hero */}
       <div style={{ background: '#1a3a5c', padding: '2.5rem 0 3rem' }}>
         <Container>
           <a href="/" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', display: 'inline-block', marginBottom: '1.25rem' }}>
-            ← Back to all assessors
+            Back to all assessors
           </a>
           <h1 style={{ color: '#fff', fontSize: '26px', fontWeight: 500, margin: '0 0 10px', lineHeight: 1.3 }}>
             {meta.h1}
@@ -69,7 +68,6 @@ export default async function LocationPage({ params }: Props) {
         </Container>
       </div>
 
-      {/* Assessor list */}
       <Section>
         <Container>
           <p style={{ fontSize: '15px', color: '#374151', marginBottom: '1.5rem' }}>
@@ -82,7 +80,7 @@ export default async function LocationPage({ params }: Props) {
           {count === 0 ? (
             <div style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '12px', padding: '2rem', textAlign: 'center' }}>
               <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '1rem' }}>
-                We don't have any {meta.conditionLabel} assessors listed in {meta.city} yet.
+                We do not have any {meta.conditionLabel} assessors listed in {meta.city} yet.
               </p>
               <a href="/list-your-practice" style={{ display: 'inline-block', background: '#1a3a5c', color: '#fff', fontSize: '14px', fontWeight: 500, padding: '10px 20px', borderRadius: '8px', textDecoration: 'none' }}>
                 List your practice
@@ -108,8 +106,116 @@ export default async function LocationPage({ params }: Props) {
         </Container>
       </Section>
 
-      {/* Condition-specific SEO */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
-            <h2 style={{ fontSize: '17px', fontWeight: 500, margin: '0 0 1re
+            <h2 style={{ fontSize: '17px', fontWeight: 500, margin: '0 0 1rem', color: '#111827' }}>
+              About {meta.conditionLabel} assessments in {meta.city}
+            </h2>
+            {meta.seoBody.split('\n\n').map((para, i) => (
+              <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+                {para}
+              </p>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      {meta.seoExtra && (
+        <Section style={{ paddingTop: 0 }}>
+          <Container>
+            <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
+              <h2 style={{ fontSize: '17px', fontWeight: 500, margin: '0 0 1rem', color: '#111827' }}>
+                How to find an ADHD assessment near you
+              </h2>
+              {meta.seoExtra.split('\n\n').map((para, i) => (
+                <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+                  {para}
+                </p>
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
+
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
+            <h2 style={{ fontSize: '17px', fontWeight: 500, margin: '0 0 1rem', color: '#111827' }}>
+              Private vs NHS assessments: what is the difference?
+            </h2>
+            {[
+              'There are two main routes to getting an ADHD, autism, or dyslexia assessment in the UK: through the NHS or through a private provider.',
+              'NHS assessments are typically free at the point of access, but waiting times are often long due to high demand. In many areas, people may wait several months or longer for an appointment.',
+              'Private assessments involve paying for the service, but they usually offer significantly shorter waiting times. Many providers can offer appointments within weeks rather than months.',
+              'Private assessments may also provide more flexibility in scheduling and choice of clinician, including remote options.',
+              'For many people, the decision comes down to urgency, budget, and availability.',
+              'Assessment Finder allows you to compare private assessors and see who is currently available, helping you make a more informed decision.',
+            ].map((para, i, arr) => (
+              <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: i < arr.length - 1 ? '0.75rem' : 0 }}>
+                {para}
+              </p>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1rem' }}>
+            Related searches
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            {relatedLinks(meta.conditionLabel, meta.city).map((link) => (
+              <a key={link.href} href={link.href} style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '20px', padding: '6px 14px', fontSize: '13px', color: '#1a3a5c', textDecoration: 'none' }}>
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+    </PageLayout>
+  )
+}
+
+function SummaryPill({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div style={{ background: highlight ? 'rgba(74,222,128,0.12)' : 'rgba(255,255,255,0.08)', border: `0.5px solid ${highlight ? 'rgba(74,222,128,0.3)' : 'rgba(255,255,255,0.15)'}`, borderRadius: '10px', padding: '10px 16px' }}>
+      <p style={{ fontSize: '11px', color: highlight ? '#4ade80' : 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.7px', margin: '0 0 3px', fontWeight: 500 }}>
+        {label}
+      </p>
+      <p style={{ fontSize: '15px', fontWeight: 500, color: highlight ? '#4ade80' : '#fff', margin: 0 }}>
+        {value}
+      </p>
+    </div>
+  )
+}
+
+function formatUpdatedAt(timestamp?: string | null): string {
+  if (!timestamp) return 'recently'
+  const diff = Date.now() - new Date(timestamp).getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  if (days === 0) return 'today'
+  if (days === 1) return '1 day ago'
+  return `${days} days ago`
+}
+
+const OTHER_CONDITIONS: Record<string, string[]> = {
+  ADHD: ['Autism', 'Dyslexia'],
+  Autism: ['ADHD', 'Dyslexia'],
+  Dyslexia: ['ADHD', 'Autism'],
+}
+
+const CITIES = ['London', 'Manchester', 'Birmingham', 'Bristol', 'Leeds', 'Edinburgh']
+
+function relatedLinks(condition: string, city: string) {
+  const links: { label: string; href: string }[] = []
+  CITIES.filter((c) => c !== city).slice(0, 3).forEach((c) => {
+    links.push({ label: `${condition} assessment ${c}`, href: `/${condition.toLowerCase()}-assessment-${c.toLowerCase()}` })
+  })
+  OTHER_CONDITIONS[condition]?.forEach((cond) => {
+    links.push({ label: `${cond} assessment ${city}`, href: `/${cond.toLowerCase()}-assessment-${city.toLowerCase()}` })
+  })
+  return links
+}
