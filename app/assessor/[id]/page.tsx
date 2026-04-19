@@ -1,237 +1,59 @@
-import { notFound } from 'next/navigation'
-import { getAssessorById } from '@/lib/api'
+import { getAssessors } from '@/lib/api'
+import { AssessorWithAvailability } from '@/lib/api'
 import { PageLayout, Container, Section } from '@/components/Layout'
-import { AvailabilityBadge } from '@/components/AvailabilityBadge'
-import { ContactForm } from '@/components/ContactForm'
+import { AssessorGrid } from '@/components/AssessorGrid'
 
-interface Props {
-  params: Promise<{ id: string }>
-}
+export default async function HomePage() {
+  let assessors: AssessorWithAvailability[] = []
+  let error = false
 
-export default async function AssessorProfilePage({ params }: Props) {
-  const { id } = await params
-  const assessor = await getAssessorById(id)
-  if (!assessor) notFound()
-
-  const av = assessor.availability
-  const updatedAt = formatUpdatedAt(av?.last_updated)
-  const nextDate = av?.next_available_date
-    ? formatDate(av.next_available_date)
-    : null
+  try {
+    assessors = await getAssessors()
+  } catch (e) {
+    error = true
+  }
 
   return (
     <PageLayout>
 
-      {/* ── Hero ─────────────────────────────────────────── */}
-      <div style={{ background: '#1a3a5c', padding: '2.5rem 0 3rem' }}>
-        <Container>
-          <a href="/" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', display: 'inline-block', marginBottom: '1.25rem' }}>
-            ← Back to all assessors
-          </a>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1.5rem' }}>
-
-            {/* Name + meta */}
-            <div>
-              <h1 style={{ color: '#fff', fontSize: '26px', fontWeight: 500, margin: '0 0 4px' }}>
-                {assessor.name}
-              </h1>
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', margin: '0 0 10px' }}>
-                {assessor.professional_title} · 📍 {assessor.location_city}
-              </p>
-              {assessor.is_verified && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(74,222,128,0.15)', color: '#4ade80', fontSize: '12px', fontWeight: 500, padding: '3px 10px', borderRadius: '20px', border: '0.5px solid rgba(74,222,128,0.3)' }}>
-                  ✓ Verified practitioner
-                </span>
-              )}
-            </div>
-
-            {/* Availability — prominent */}
-            <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1.25rem 1.5rem', minWidth: '200px' }}>
-              <p style={{ fontSize: '11px', fontWeight: 500, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 8px' }}>
-                Availability
-              </p>
-              {av ? (
-                <>
-                  <AvailabilityBadge range={av.availability_range} />
-                  {nextDate && (
-                    <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', margin: '8px 0 0' }}>
-                      Next available: <strong style={{ color: '#fff' }}>{nextDate}</strong>
-                    </p>
-                  )}
-                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', margin: '6px 0 0' }}>
-                    Updated {updatedAt}
-                  </p>
-                </>
-              ) : (
-                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>Not yet updated</p>
-              )}
-            </div>
-
-          </div>
+      {/* Hero */}
+      <div style={{ background: '#1a3a5c', padding: '3rem 0 4rem' }}>
+        <Container style={{ textAlign: 'center' }}>
+          <h1 style={{ color: '#fff', fontSize: '28px', fontWeight: 500, lineHeight: 1.35, maxWidth: '560px', margin: '0 auto 0.75rem' }}>
+            Find ADHD, Autism &amp; Dyslexia Assessments with Real Availability
+          </h1>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', marginBottom: '2rem' }}>
+            See who can assess you in the next few weeks
+          </p>
         </Container>
       </div>
 
-      {/* ── Body ─────────────────────────────────────────── */}
+      {/* Assessor listing with filtering */}
       <Section>
         <Container>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)', gap: '24px', alignItems: 'start' }}>
+          {error && (
+            <p style={{ color: '#991b1b', fontSize: '14px', background: '#fee2e2', padding: '1rem', borderRadius: '8px', marginBottom: '1.25rem' }}>
+              Could not load assessors. Please check your Supabase connection.
+            </p>
+          )}
+          {!error && <AssessorGrid assessors={assessors} />}
+        </Container>
+      </Section>
 
-            {/* ── Left column ── */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-              {/* Quick summary */}
-              <Card title="Quick summary">
-                <ul style={{ margin: 0, paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <SummaryItem label="Conditions" value={assessor.conditions.join(', ')} />
-                  <SummaryItem label="Location" value={assessor.location_city} />
-                  <SummaryItem label="Assessment types" value={assessor.assessment_types.join(', ')} />
-                  {assessor.price_range && (
-                    <SummaryItem label="Price range" value={assessor.price_range} />
-                  )}
-                  {av && (
-                    <SummaryItem label="Availability" value={AVAILABILITY_LABELS[av.availability_range] ?? av.availability_range} />
-                  )}
-                </ul>
-              </Card>
-
-              {/* Bio */}
-              {assessor.bio && (
-                <Card title="About">
-                  <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.75, margin: 0 }}>
-                    {assessor.bio}
-                  </p>
-                </Card>
-              )}
-
-              {/* Assessment details */}
-              <Card title="Assessment details">
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {assessor.conditions.map((c) => (
-                    <Tag key={c} label={c} />
-                  ))}
-                  {assessor.assessment_types.map((t) => (
-                    <Tag key={t} label={t} color="blue" />
-                  ))}
-                </div>
-              </Card>
-
-              {/* Credentials */}
-              <Card title="Credentials">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {assessor.governing_body && (
-                    <Row label="Governing body" value={assessor.governing_body} />
-                  )}
-                  {assessor.registration_number && (
-                    <Row label="Registration no." value={assessor.registration_number} />
-                  )}
-                  <Row
-                    label="Verified"
-                    value={assessor.is_verified ? '✓ Yes — identity and credentials checked' : 'Not yet verified'}
-                    valueColor={assessor.is_verified ? '#166534' : '#6b7280'}
-                  />
-                </div>
-              </Card>
-
-            </div>
-
-            {/* ── Right column ── */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-              {/* Price */}
-              {assessor.price_range && (
-                <Card title="Price range">
-                  <p style={{ fontSize: '22px', fontWeight: 500, color: '#1a3a5c', margin: '0 0 6px' }}>
-                    {assessor.price_range}
-                  </p>
-                  <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>
-                    Prices are set by the assessor and may vary. Always confirm directly.
-                  </p>
-                </Card>
-              )}
-
-              {/* Sticky contact CTA */}
-              <div style={{ position: 'sticky', top: '1rem' }}>
-                <Card title={`Contact ${assessor.name.split(' ')[0]}`}>
-                  <ContactForm assessorId={assessor.id} assessorName={assessor.name} />
-                </Card>
-              </div>
-
-            </div>
-
+      {/* SEO section */}
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
+            <h2 style={{ fontSize: '17px', fontWeight: 500, marginBottom: '0.75rem' }}>
+              Finding the right assessment in the UK
+            </h2>
+            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: 1.7 }}>
+              Getting assessed for ADHD, autism, or dyslexia can involve long NHS wait times — often 2–3 years. Private assessors can dramatically reduce this, with many offering appointments within weeks. Assessment Finder lists verified professionals across the UK and shows real availability, so you can make an informed choice quickly. All assessors are registered with a recognised governing body such as the BPS, HCPC, or GMC.
+            </p>
           </div>
         </Container>
       </Section>
 
     </PageLayout>
   )
-}
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
-      <h2 style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 1rem' }}>
-        {title}
-      </h2>
-      {children}
-    </div>
-  )
-}
-
-function SummaryItem({ label, value }: { label: string; value: string }) {
-  return (
-    <li style={{ fontSize: '14px', color: '#374151' }}>
-      <span style={{ color: '#9ca3af' }}>{label}:</span>{' '}
-      <span style={{ fontWeight: 500 }}>{value}</span>
-    </li>
-  )
-}
-
-function Row({ label, value, valueColor = '#111827' }: { label: string; value: string; valueColor?: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid #f3f4f6', paddingBottom: '10px', gap: '12px' }}>
-      <span style={{ fontSize: '13px', color: '#9ca3af', flexShrink: 0 }}>{label}</span>
-      <span style={{ fontSize: '13px', fontWeight: 500, color: valueColor, textAlign: 'right' }}>{value}</span>
-    </div>
-  )
-}
-
-function Tag({ label, color = 'navy' }: { label: string; color?: 'navy' | 'blue' }) {
-  const styles = {
-    navy: { background: '#e8f0fa', color: '#1a3a5c' },
-    blue: { background: '#eff6ff', color: '#1d4ed8' },
-  }
-  return (
-    <span style={{ ...styles[color], fontSize: '12px', padding: '4px 12px', borderRadius: '20px', fontWeight: 500 }}>
-      {label}
-    </span>
-  )
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const AVAILABILITY_LABELS: Record<string, string> = {
-  'within-2-weeks': 'Within 2 weeks',
-  '2-4-weeks':      '2–4 weeks',
-  '1-3-months':     '1–3 months',
-  '3-plus-months':  '3+ months',
-}
-
-function formatUpdatedAt(timestamp?: string | null): string {
-  if (!timestamp) return 'recently'
-  const diff = Date.now() - new Date(timestamp).getTime()
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  if (days === 0) return 'today'
-  if (days === 1) return '1 day ago'
-  return `${days} days ago`
-}
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
 }
