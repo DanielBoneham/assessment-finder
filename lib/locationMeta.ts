@@ -1,17 +1,14 @@
-// Generates page-level SEO copy for each condition + city combination.
-// Add more cities or conditions here as the directory grows.
-
 export type Condition = 'adhd' | 'autism' | 'dyslexia'
 
 export interface LocationPageMeta {
   condition: Condition
-  conditionLabel: string        // "ADHD"
-  city: string                  // "London" (display)
-  pageTitle: string             // <title> tag
-  metaDescription: string       // <meta description>
+  conditionLabel: string
+  city: string
+  pageTitle: string
+  metaDescription: string
   h1: string
-  intro: string                 // paragraph below the summary bar
-  seoBody: string               // longer SEO block at bottom
+  intro: string
+  seoBody: string
 }
 
 export function buildLocationMeta(
@@ -37,8 +34,6 @@ export function buildLocationMeta(
   }
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 const CONDITION_LABELS: Record<Condition, string> = {
   adhd:     'ADHD',
   autism:   'Autism',
@@ -52,8 +47,6 @@ function slugToTitle(slug: string): string {
     .join(' ')
 }
 
-// ─── SEO copy per condition ───────────────────────────────────────────────────
-
 const SEO_BODY: Record<Condition, (city: string) => string> = {
   adhd: (city) => `
 Getting an ADHD assessment in ${city} through the NHS typically involves a long wait — often 18 months to 3 years depending on your local trust. Private assessors in ${city} can significantly reduce this, with many offering appointments within weeks.
@@ -64,11 +57,13 @@ Prices for a private ADHD assessment in ${city} typically range from £500 to £
   `.trim(),
 
   autism: (city) => `
-Autism assessments in ${city} are available privately for both adults and children. NHS waiting lists for autism diagnosis in England can exceed 3 years in some areas. Private assessors can often offer appointments within weeks or months.
+An autism assessment is designed to understand how a person thinks, communicates, and experiences the world.
 
-A private autism assessment in the UK involves a structured clinical interview (such as the ADOS-2 or ADI-R), observation, and a detailed report. Most assessors work with both children and adults, though some specialise in one group — check the tags on each profile.
+The process usually involves a detailed consultation, questionnaires, and sometimes input from family members or carers. Assessments can take place over one or more sessions and may be conducted in person or remotely.
 
-Costs for a private autism assessment in ${city} generally range from £800 to £2,000. Assessment Finder shows verified practitioners with current availability so you can make an informed choice.
+Waiting times vary significantly depending on demand in ${city}. Some providers may have availability within weeks, while others may have longer waiting lists.
+
+Using a directory that shows availability can help you find an assessor in ${city} who can see you sooner.
   `.trim(),
 
   dyslexia: (city) => `
