@@ -48,7 +48,6 @@ export default async function LocationPage({ params }: Props) {
   return (
     <PageLayout>
 
-      {/* Hero */}
       <div style={{ background: '#1a3a5c', padding: '2.5rem 0 3rem' }}>
         <Container>
           <a href="/" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', display: 'inline-block', marginBottom: '1.25rem' }}>
@@ -69,7 +68,6 @@ export default async function LocationPage({ params }: Props) {
         </Container>
       </div>
 
-      {/* Assessor listing */}
       <Section>
         <Container>
           <SectionHeading>
@@ -81,7 +79,6 @@ export default async function LocationPage({ params }: Props) {
               : `There ${count === 1 ? 'is' : 'are'} ${count} ${meta.conditionLabel} assessor${count === 1 ? '' : 's'} in ${meta.city}.${fastest ? ` The fastest availability is ${fastest.toLowerCase()}.` : ''}`
             }
           </p>
-
           {count === 0 ? (
             <div style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '12px', padding: '2rem', textAlign: 'center' }}>
               <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '1rem' }}>
@@ -111,7 +108,6 @@ export default async function LocationPage({ params }: Props) {
         </Container>
       </Section>
 
-      {/* What to expect */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
@@ -127,7 +123,6 @@ export default async function LocationPage({ params }: Props) {
         </Container>
       </Section>
 
-      {/* ADHD only extra section */}
       {meta.seoExtra && (
         <Section style={{ paddingTop: 0 }}>
           <Container>
@@ -143,7 +138,6 @@ export default async function LocationPage({ params }: Props) {
         </Section>
       )}
 
-      {/* Private vs NHS */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
@@ -164,7 +158,6 @@ export default async function LocationPage({ params }: Props) {
         </Container>
       </Section>
 
-      {/* Related links */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1rem' }}>
@@ -225,4 +218,10 @@ const CITIES = ['London', 'Manchester', 'Birmingham', 'Bristol', 'Leeds', 'Edinb
 function relatedLinks(condition: string, city: string) {
   const links: { label: string; href: string }[] = []
   CITIES.filter((c) => c !== city).slice(0, 3).forEach((c) => {
-    links
+    links.push({ label: `${condition} assessment ${c}`, href: `/${condition.toLowerCase()}-assessment-${c.toLowerCase()}` })
+  })
+  OTHER_CONDITIONS[condition]?.forEach((cond) => {
+    links.push({ label: `${cond} assessment ${city}`, href: `/${cond.toLowerCase()}-assessment-${city.toLowerCase()}` })
+  })
+  return links
+}

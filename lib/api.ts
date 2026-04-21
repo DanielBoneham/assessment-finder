@@ -1,91 +1,118 @@
-import { notFound } from 'next/navigation'
-import type { Metadata } from 'next'
-import { getArticleBySlug, ARTICLES, formatDate, renderParagraph } from '@/lib/articles'
-import { PageLayout, Container, Section } from '@/components/Layout'
+import { supabase } from './supabase'
 
-interface Props {
-  params: Promise<{ slug: string }>
+export type AvailabilityRange =
+  | 'within-2-weeks'
+  | '2-4-weeks'
+  | '1-3-months'
+  | '3-plus-months'
+
+export interface Assessor {
+  id: string
+  name: string
+  email: string
+  location_city: string
+  professional_title: string
+  governing_body: string | null
+  registration_number: string | null
+  bio: string | null
+  price_range: string | null
+  conditions: string[]
+  assessment_types: string[]
+  tier: 'free' | 'featured'
+  is_verified: boolean
+  created_at: string
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
-  const article = getArticleBySlug(slug)
-  if (!article) return {}
+export interface Availability {
+  id: string
+  assessor_id: string
+  availability_range: AvailabilityRange
+  next_available_date: string | null
+  last_updated: string
+}
+
+export interface AssessorWithAvailability extends Assessor {
+  availability: Availability | null
+}
+
+export interface Lead {
+  assessor_id: string
+  name: string
+  email: string
+  message?: string
+  condition?: string
+}
+
+export const AVAILABILITY_LABELS: Record<AvailabilityRange, string> = {
+  'within-2-weeks': 'Within 2 weeks',
+  '2-4-weeks':      '2 to 4 weeks',
+  '1-3-months':     '1 to 3 months',
+  '3-plus-months':  '3 or more months',
+}
+
+const AVAILABILITY_ORDER: AvailabilityRange[] = [
+  'within-2-weeks',
+  '2-4-weeks',
+  '1-3-months',
+  '3-plus-months',
+]
+
+export function fastestAvailability(assessors: AssessorWithAvailability[]): string {
+  const ranges = assessors
+    .map((a) => a.availability?.availability_range)
+    .filter(Boolean) as AvailabilityRange[]
+  const fastest = AVAILABILITY_ORDER.find((r) => ranges.includes(r))
+  return fastest ? AVAILABILITY_LABELS[fastest] : 'unknown'
+}
+
+function normalise(raw: any[]): AssessorWithAvailability[] {
+  return raw.map((row) => ({
+    ...row,
+    availability: Array.isArray(row.availability)
+      ? (row.availability[0] ?? null)
+      : null,
+  }))
+}
+
+export async function getAssessors(): Promise<AssessorWithAvailability[]> {
+  const { data, error } = await supabase
+    .from('assessors')
+    .select('*, availability(*)')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return normalise(data ?? [])
+}
+
+export async function searchAssessors(
+  city?: string,
+  condition?: string
+): Promise<AssessorWithAvailability[]> {
+  let query = supabase.from('assessors').select('*, availability(*)')
+  if (city)      query = query.ilike('location_city', `%${city}%`)
+  if (condition) query = query.contains('conditions', [condition])
+  const { data, error } = await query.order('created_at', { ascending: false })
+  if (error) throw error
+  return normalise(data ?? [])
+}
+
+export async function getAssessorById(
+  id: string
+): Promise<AssessorWithAvailability | null> {
+  const { data, error } = await supabase
+    .from('assessors')
+    .select('*, availability(*)')
+    .eq('id', id)
+    .single()
+  if (error) return null
   return {
-    title: `${article.title} | Assessment Finder`,
-    description: article.metaDescription,
+    ...data,
+    availability: Array.isArray(data.availability)
+      ? (data.availability[0] ?? null)
+      : null,
   }
 }
 
-export async function generateStaticParams() {
-  return ARTICLES.map((a) => ({ slug: a.slug }))
-}
-
-export default async function ArticlePage({ params }: Props) {
-  const { slug } = await params
-  const article = getArticleBySlug(slug)
-  if (!article) notFound()
-
-  return (
-    <PageLayout>
-
-      <div style={{ background: '#1a3a5c', padding: '2.5rem 0 3rem' }}>
-        <Container style={{ maxWidth: '720px' }}>
-          <a href="/articles" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', display: 'inline-block', marginBottom: '1.25rem' }}>
-            Back to articles
-          </a>
-          <h1 style={{ color: '#fff', fontSize: '26px', fontWeight: 500, margin: '0 0 12px', lineHeight: 1.35 }}>
-            {article.title}
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', margin: 0 }}>
-            {formatDate(article.publishedDate)}
-          </p>
-        </Container>
-      </div>
-
-      <Section>
-        <Container style={{ maxWidth: '720px' }}>
-          <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '2rem' }}>
-            {article.content.map((para, i) => {
-              const rendered = renderParagraph(para)
-              return (
-                <p key={i} style={{ fontSize: '16px', color: '#374151', lineHeight: 1.85, marginBottom: i < article.content.length - 1 ? '1.25rem' : 0 }}>
-                  {'text' in rendered ? (
-                    rendered.text
-                  ) : (
-                    <>
-                      {rendered.before}
-                      <a href={rendered.href} style={{ color: '#1a3a5c', fontWeight: 500, textDecoration: 'underline' }}>
-                        {rendered.anchor}
-                      </a>
-                      {rendered.after}
-                    </>
-                  )}
-                </p>
-              )
-            })}
-          </div>
-
-          <div style={{ marginTop: '1.5rem' }}>
-            <a href="/articles" style={{ fontSize: '14px', color: '#1a3a5c', textDecoration: 'none', fontWeight: 500 }}>
-              Back to all articles
-            </a>
-          </div>
-
-          <div style={{ background: '#1a3a5c', borderRadius: '12px', padding: '1.75rem', marginTop: '1.5rem', textAlign: 'center' }}>
-            <p style={{ color: '#fff', fontSize: '17px', fontWeight: 500, margin: '0 0 8px' }}>
-              Find an assessor near you
-            </p>
-            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', margin: '0 0 1.25rem' }}>
-              Search by location and see who has availability in the next few weeks.
-            </p>
-            <a href="/" style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '14px', fontWeight: 500, padding: '10px 24px', borderRadius: '8px', textDecoration: 'none' }}>
-              Search assessors
-            </a>
-          </div>
-        </Container>
-      </Section>
-
-    </PageLayout>
-  )
+export async function submitLead(lead: Lead): Promise<void> {
+  const { error } = await supabase.from('leads').insert(lead)
+  if (error) throw error
 }
