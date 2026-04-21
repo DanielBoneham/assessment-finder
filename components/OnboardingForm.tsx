@@ -7,6 +7,7 @@ type Status = 'idle' | 'submitting' | 'success' | 'error'
 
 export function OnboardingForm() {
   const [status, setStatus] = useState<Status>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -40,29 +41,37 @@ export function OnboardingForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setStatus('submitting')
+    setErrorMessage('')
 
     try {
+      const insertData = {
+        name: form.name,
+        email: form.email,
+        location_city: form.location_city,
+        professional_title: form.professional_title,
+        governing_body: form.governing_body || null,
+        registration_number: form.registration_number || null,
+        bio: form.bio || null,
+        price_range: form.price_range || null,
+        conditions: form.conditions,
+        assessment_types: form.assessment_types,
+        is_verified: false,
+        tier: 'free',
+      }
+
       const { data: assessor, error: assessorError } = await supabase
         .from('assessors')
-        .insert({
-          name: form.name,
-          email: form.email,
-          location_city: form.location_city,
-          professional_title: form.professional_title,
-          governing_body: form.governing_body || null,
-          registration_number: form.registration_number || null,
-          bio: form.bio || null,
-          price_range: form.price_range || null,
-          conditions: form.conditions,
-          assessment_types: form.assessment_types,
-          is_verified: false,
-        })
+        .insert(insertData)
         .select()
         .single()
 
-      if (assessorError) throw assessorError
+      if (assessorError) {
+        setErrorMessage(assessorError.message)
+        setStatus('error')
+        return
+      }
 
-      if (form.availability_range) {
+      if (form.availability_range && assessor) {
         const { error: avError } = await supabase
           .from('availability')
           .insert({
@@ -70,12 +79,16 @@ export function OnboardingForm() {
             availability_range: form.availability_range,
             last_updated: new Date().toISOString(),
           })
-        if (avError) throw avError
+        if (avError) {
+          setErrorMessage(avError.message)
+          setStatus('error')
+          return
+        }
       }
 
       setStatus('success')
-    } catch (err) {
-      console.error(err)
+    } catch (err: any) {
+      setErrorMessage(err?.message ?? 'Unknown error')
       setStatus('error')
     }
   }
@@ -138,12 +151,7 @@ export function OnboardingForm() {
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               {['ADHD', 'Autism', 'Dyslexia'].map((c) => (
                 <label key={c} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#374151' }}>
-                  <input
-                    type="checkbox"
-                    checked={form.conditions.includes(c)}
-                    onChange={() => handleCheckbox('conditions', c)}
-                    style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-                  />
+                  <input type="checkbox" checked={form.conditions.includes(c)} onChange={() => handleCheckbox('conditions', c)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
                   {c}
                 </label>
               ))}
@@ -154,12 +162,7 @@ export function OnboardingForm() {
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               {['Adults', 'Children', 'Remote'].map((t) => (
                 <label key={t} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#374151' }}>
-                  <input
-                    type="checkbox"
-                    checked={form.assessment_types.includes(t)}
-                    onChange={() => handleCheckbox('assessment_types', t)}
-                    style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-                  />
+                  <input type="checkbox" checked={form.assessment_types.includes(t)} onChange={() => handleCheckbox('assessment_types', t)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
                   {t}
                 </label>
               ))}
@@ -188,15 +191,15 @@ export function OnboardingForm() {
             <textarea name="bio" value={form.bio} onChange={handleChange} placeholder="Tell potential clients about your experience and approach..." rows={4} style={{ ...inputStyle, height: 'auto', resize: 'vertical' }} />
           </Field>
           <Field label="Price range">
-            <input name="price_range" value={form.price_range} onChange={handleChange} placeholder="e.g. £800 – £1,200" style={inputStyle} />
+            <input name="price_range" value={form.price_range} onChange={handleChange} placeholder="e.g. £800 to £1,200" style={inputStyle} />
           </Field>
         </div>
       </div>
 
       {status === 'error' && (
-        <p style={{ fontSize: '13px', color: '#991b1b', background: '#fee2e2', padding: '10px 14px', borderRadius: '8px', marginBottom: '14px' }}>
-          Something went wrong. Please try again.
-        </p>
+        <div style={{ fontSize: '13px', color: '#991b1b', background: '#fee2e2', padding: '10px 14px', borderRadius: '8px', marginBottom: '14px' }}>
+          <strong>Error:</strong> {errorMessage || 'Something went wrong. Please try again.'}
+        </div>
       )}
 
       <button
