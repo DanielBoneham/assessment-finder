@@ -9,6 +9,21 @@ interface Props {
   params: Promise<{ slug: string }>
 }
 
+const AVAILABILITY_ORDER: Record<string, number> = {
+  'within-2-weeks': 0,
+  '2-4-weeks':      1,
+  '1-3-months':     2,
+  '3-plus-months':  3,
+}
+
+function sortByAvailability(assessors: AssessorWithAvailability[]): AssessorWithAvailability[] {
+  return [...assessors].sort((a, b) => {
+    const aO = AVAILABILITY_ORDER[a.availability?.availability_range ?? '3-plus-months'] ?? 3
+    const bO = AVAILABILITY_ORDER[b.availability?.availability_range ?? '3-plus-months'] ?? 3
+    return aO - bO
+  })
+}
+
 function parseSlug(slug: string): { condition: string; city: string } | null {
   const parts = slug.split('-assessment-')
   if (parts.length !== 2) return null
@@ -42,6 +57,7 @@ export default async function LocationPage({ params }: Props) {
     // show page with empty state rather than crashing
   }
 
+  const sorted = sortByAvailability(assessors)
   const fastest = assessors.length > 0 ? fastestAvailability(assessors) : null
   const count = assessors.length
 
@@ -56,10 +72,21 @@ export default async function LocationPage({ params }: Props) {
           <h1 style={{ color: '#fff', fontSize: '26px', fontWeight: 500, margin: '0 0 10px', lineHeight: 1.3 }}>
             {meta.h1}
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '15px', maxWidth: '560px', margin: 0 }}>
+          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '15px', maxWidth: '560px', margin: '0 0 1.5rem' }}>
             {meta.intro}
           </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '1.75rem' }}>
+
+          {/* Fastest availability callout */}
+          {fastest && (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(74,222,128,0.15)', border: '0.5px solid rgba(74,222,128,0.4)', borderRadius: '10px', padding: '10px 18px', marginBottom: '1.25rem' }}>
+              <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: '#4ade80', flexShrink: 0 }} />
+              <p style={{ color: '#fff', fontSize: '14px', fontWeight: 500, margin: 0 }}>
+                Fastest {meta.conditionLabel} assessment availability in {meta.city}: <span style={{ color: '#4ade80' }}>{fastest}</span>
+              </p>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
             <SummaryPill label="Assessors listed" value={count > 0 ? String(count) : 'None yet'} />
             {fastest && <SummaryPill label="Fastest availability" value={fastest} highlight />}
             <SummaryPill label="Location" value={meta.city} />
@@ -76,7 +103,7 @@ export default async function LocationPage({ params }: Props) {
           <p style={{ fontSize: '15px', color: '#374151', marginBottom: '1.5rem' }}>
             {count === 0
               ? `No assessors are listed in ${meta.city} for ${meta.conditionLabel} yet.`
-              : `There ${count === 1 ? 'is' : 'are'} ${count} ${meta.conditionLabel} assessor${count === 1 ? '' : 's'} in ${meta.city}.${fastest ? ` The fastest availability is ${fastest.toLowerCase()}.` : ''}`
+              : `There ${count === 1 ? 'is' : 'are'} ${count} ${meta.conditionLabel} assessor${count === 1 ? '' : 's'} in ${meta.city}. Sorted by fastest availability first.`
             }
           </p>
           {count === 0 ? (
@@ -90,7 +117,7 @@ export default async function LocationPage({ params }: Props) {
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
-              {assessors.map((assessor) => (
+              {sorted.map((assessor) => (
                 <ProfileCard
                   key={assessor.id}
                   id={assessor.id}
@@ -160,6 +187,20 @@ export default async function LocationPage({ params }: Props) {
 
       <Section style={{ paddingTop: 0 }}>
         <Container>
+          <div style={{ background: '#1a3a5c', borderRadius: '12px', padding: '1.75rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+            <div>
+              <p style={{ color: '#fff', fontSize: '16px', fontWeight: 500, margin: '0 0 4px' }}>Are you an assessor in {meta.city}?</p>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px', margin: 0 }}>List your practice for free and appear on this page.</p>
+            </div>
+            <a href="/list-your-practice" style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '13px', fontWeight: 600, padding: '10px 20px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+              List your practice
+            </a>
+          </div>
+        </Container>
+      </Section>
+
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
           <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1rem' }}>
             Related searches
           </p>
@@ -188,12 +229,8 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 function SummaryPill({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div style={{ background: highlight ? 'rgba(74,222,128,0.12)' : 'rgba(255,255,255,0.08)', border: `0.5px solid ${highlight ? 'rgba(74,222,128,0.3)' : 'rgba(255,255,255,0.15)'}`, borderRadius: '10px', padding: '10px 16px' }}>
-      <p style={{ fontSize: '11px', color: highlight ? '#4ade80' : 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.7px', margin: '0 0 3px', fontWeight: 500 }}>
-        {label}
-      </p>
-      <p style={{ fontSize: '15px', fontWeight: 500, color: highlight ? '#4ade80' : '#fff', margin: 0 }}>
-        {value}
-      </p>
+      <p style={{ fontSize: '11px', color: highlight ? '#4ade80' : 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.7px', margin: '0 0 3px', fontWeight: 500 }}>{label}</p>
+      <p style={{ fontSize: '15px', fontWeight: 500, color: highlight ? '#4ade80' : '#fff', margin: 0 }}>{value}</p>
     </div>
   )
 }
