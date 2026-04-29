@@ -43,10 +43,7 @@ export function PageLayout({ children }: PageLayoutProps) {
           <a href="/" style={navLink}>Find Assessments</a>
 
           <div style={{ position: 'relative' }}>
-            <button
-              onClick={() => setLocationsOpen(!locationsOpen)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', padding: 0, fontFamily: 'inherit', color: 'rgba(255,255,255,0.75)', fontSize: '14px' }}
-            >
+            <button onClick={() => setLocationsOpen(!locationsOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', padding: 0, fontFamily: 'inherit', color: 'rgba(255,255,255,0.75)', fontSize: '14px' }}>
               Locations <span style={{ fontSize: '10px' }}>▼</span>
             </button>
             {locationsOpen && (
@@ -65,14 +62,9 @@ export function PageLayout({ children }: PageLayoutProps) {
           </div>
 
           <a href="/articles" style={navLink}>Articles</a>
-
           <a href="/list-your-practice" style={navLink}>For Assessors</a>
-
-          
-            href="/list-your-practice"
-            style={{ color: '#1a3a5c', background: '#4ade80', fontSize: '13px', fontWeight: 600, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px', whiteSpace: 'nowrap' }}
-          >
-            List your practice →
+          <a href="/list-your-practice" style={{ color: '#1a3a5c', background: '#4ade80', fontSize: '13px', fontWeight: 600, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px', whiteSpace: 'nowrap' }}>
+            List your practice
           </a>
         </div>
       </nav>
