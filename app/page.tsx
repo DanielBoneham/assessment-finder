@@ -13,9 +13,19 @@ export default async function HomePage() {
     error = true
   }
 
+  // Featured = verified assessors
+  const featured = assessors.filter((a) => a.is_verified).slice(0, 3)
+
+  // Recently updated = sorted by last_updated
+  const recentlyUpdated = [...assessors]
+    .filter((a) => a.availability?.last_updated)
+    .sort((a, b) => new Date(b.availability!.last_updated).getTime() - new Date(a.availability!.last_updated).getTime())
+    .slice(0, 3)
+
   return (
     <PageLayout>
 
+      {/* Hero */}
       <div style={{ background: '#1a3a5c', padding: '3.5rem 0 4.5rem' }}>
         <Container style={{ textAlign: 'center' }}>
           <h1 style={{ color: '#fff', fontSize: '32px', fontWeight: 500, lineHeight: 1.3, maxWidth: '600px', margin: '0 auto 1rem' }}>
@@ -40,6 +50,7 @@ export default async function HomePage() {
         </Container>
       </div>
 
+      {/* Trust bar */}
       <div style={{ background: '#fff', borderBottom: '0.5px solid #e5e7eb' }}>
         <Container>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '24px', padding: '14px 0' }}>
@@ -55,11 +66,10 @@ export default async function HomePage() {
         </Container>
       </div>
 
+      {/* How it works */}
       <Section>
         <Container>
-          <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1.5rem', textAlign: 'center' }}>
-            How it works
-          </p>
+          <SectionLabel>How it works</SectionLabel>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             {[
               { step: '1', title: 'Search by location', body: 'Enter your city and select the type of assessment you need.' },
@@ -78,8 +88,65 @@ export default async function HomePage() {
         </Container>
       </Section>
 
+      {/* Featured assessors */}
+      {featured.length > 0 && (
+        <Section style={{ paddingTop: 0 }}>
+          <Container>
+            <SectionLabel>Featured assessors</SectionLabel>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+              {featured.map((assessor) => (
+                <AssessorCard key={assessor.id} assessor={assessor} />
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
+
+      {/* Recently updated */}
+      {recentlyUpdated.length > 0 && (
+        <Section style={{ paddingTop: 0 }}>
+          <Container>
+            <SectionLabel>Recently updated availability</SectionLabel>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+              {recentlyUpdated.map((assessor) => (
+                <AssessorCard key={assessor.id} assessor={assessor} />
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
+
+      {/* Popular searches */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
+          <SectionLabel>Popular searches</SectionLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
+            {[
+              { label: 'ADHD assessment London', href: '/adhd-assessment-london' },
+              { label: 'ADHD assessment Manchester', href: '/adhd-assessment-manchester' },
+              { label: 'ADHD assessment Birmingham', href: '/adhd-assessment-birmingham' },
+              { label: 'Autism assessment London', href: '/autism-assessment-london' },
+              { label: 'Autism assessment Manchester', href: '/autism-assessment-manchester' },
+              { label: 'Dyslexia assessment London', href: '/dyslexia-assessment-london' },
+              { label: 'Dyslexia assessment Bristol', href: '/dyslexia-assessment-bristol' },
+              { label: 'ADHD assessment Leeds', href: '/adhd-assessment-leeds' },
+              { label: 'Autism assessment Birmingham', href: '/autism-assessment-birmingham' },
+            ].map((link) => (
+              <a key={link.href} href={link.href} style={{ textDecoration: 'none' }}>
+                <div style={{ background: '#fff', borderRadius: '10px', border: '0.5px solid #d1dce8', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', margin: 0 }}>{link.label}</p>
+                  <span style={{ color: '#9ca3af', fontSize: '14px', flexShrink: 0 }}>→</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      {/* All assessors */}
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          <SectionLabel>All assessors</SectionLabel>
           {error && (
             <p style={{ color: '#991b1b', fontSize: '14px', background: '#fee2e2', padding: '1rem', borderRadius: '8px', marginBottom: '1.25rem' }}>
               Could not load assessors. Please check your Supabase connection.
@@ -89,6 +156,7 @@ export default async function HomePage() {
         </Container>
       </Section>
 
+      {/* For Assessors CTA */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#1a3a5c', borderRadius: '12px', padding: '2rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
@@ -107,6 +175,7 @@ export default async function HomePage() {
         </Container>
       </Section>
 
+      {/* SEO block */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
@@ -131,4 +200,79 @@ export default async function HomePage() {
 
     </PageLayout>
   )
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1.25rem' }}>
+      {children}
+    </p>
+  )
+}
+
+function AssessorCard({ assessor }: { assessor: AssessorWithAvailability }) {
+  const av = assessor.availability
+  const avKey = av?.availability_range ?? '3-plus-months'
+  const isGreen = avKey === 'within-2-weeks' || avKey === '2-4-weeks'
+  const bg = isGreen ? '#dcfce7' : avKey === '1-3-months' ? '#fef3c7' : '#fee2e2'
+  const text = isGreen ? '#166534' : avKey === '1-3-months' ? '#92400e' : '#991b1b'
+  const dot = isGreen ? '#22c55e' : avKey === '1-3-months' ? '#f59e0b' : '#ef4444'
+  const labels: Record<string, string> = {
+    'within-2-weeks': 'Within 2 weeks',
+    '2-4-weeks': '2 to 4 weeks',
+    '1-3-months': '1 to 3 months',
+    '3-plus-months': '3 or more months',
+  }
+
+  function idToSeed(id: string): number {
+    let hash = 0
+    for (let i = 0; i < id.length; i++) {
+      hash = (hash << 5) - hash + id.charCodeAt(i)
+      hash |= 0
+    }
+    return Math.abs(hash) % 70 + 1
+  }
+
+  const seed = idToSeed(assessor.id)
+  const gender = seed % 2 === 0 ? 'women' : 'men'
+  const photoUrl = `https://randomuser.me/api/portraits/${gender}/${seed}.jpg`
+
+  return (
+    <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ background: bg, borderRadius: '8px', padding: '10px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: dot, flexShrink: 0 }} />
+          <p style={{ fontSize: '13px', fontWeight: 700, color: text, margin: 0 }}>{labels[avKey]}</p>
+        </div>
+        <p style={{ fontSize: '11px', color: text, margin: '0 0 0 15px', opacity: 0.75 }}>
+          Updated {formatUpdatedAt(av?.last_updated)}
+        </p>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <img src={photoUrl} alt={assessor.name} style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '0.5px solid #d1dce8' }} />
+        <div>
+          <p style={{ fontSize: '14px', fontWeight: 500, color: '#111827', margin: 0 }}>{assessor.name}</p>
+          <p style={{ fontSize: '12px', color: '#6b7280', margin: '2px 0 0' }}>{assessor.professional_title}</p>
+        </div>
+      </div>
+      <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>{assessor.location_city}</p>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+        {assessor.conditions.map((c) => (
+          <span key={c} style={{ background: '#e8f0fa', color: '#1a3a5c', fontSize: '11px', padding: '2px 8px', borderRadius: '20px' }}>{c}</span>
+        ))}
+      </div>
+      <a href={`/assessor/${assessor.id}`} style={{ display: 'block', textAlign: 'center', background: '#f0f4f8', color: '#1a3a5c', fontSize: '13px', fontWeight: 500, padding: '8px', borderRadius: '8px', textDecoration: 'none', border: '0.5px solid #d1dce8' }}>
+        View profile
+      </a>
+    </div>
+  )
+}
+
+function formatUpdatedAt(timestamp?: string | null): string {
+  if (!timestamp) return 'recently'
+  const diff = Date.now() - new Date(timestamp).getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  if (days === 0) return 'today'
+  if (days === 1) return '1 day ago'
+  return `${days} days ago`
 }
