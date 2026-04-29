@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getAssessorById } from '@/lib/api'
 import { PageLayout, Container, Section } from '@/components/Layout'
-import { AvailabilityBadge } from '@/components/AvailabilityBadge'
 import { ContactForm } from '@/components/ContactForm'
 
 interface Props {
@@ -49,16 +48,12 @@ export default async function AssessorProfilePage({ params }: Props) {
   return (
     <PageLayout>
 
-      {/* Hero */}
       <div style={{ background: '#1a3a5c', padding: '2.5rem 0 3rem' }}>
         <Container>
           <a href="/" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', display: 'inline-block', marginBottom: '1.25rem' }}>
             Back to all assessors
           </a>
-
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1.5rem' }}>
-
-            {/* Name + photo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <img src={photoUrl} alt={assessor.name} style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.2)', flexShrink: 0 }} />
               <div>
@@ -68,15 +63,18 @@ export default async function AssessorProfilePage({ params }: Props) {
                 <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', margin: '0 0 8px' }}>
                   {assessor.professional_title} · {assessor.location_city}
                 </p>
-                {assessor.is_verified && (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(74,222,128,0.15)', color: '#4ade80', fontSize: '12px', fontWeight: 500, padding: '3px 10px', borderRadius: '20px', border: '0.5px solid rgba(74,222,128,0.3)' }}>
-                    ✓ Verified practitioner
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {assessor.is_verified && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(74,222,128,0.15)', color: '#4ade80', fontSize: '12px', fontWeight: 500, padding: '3px 10px', borderRadius: '20px', border: '0.5px solid rgba(74,222,128,0.3)' }}>
+                      ✓ Verified practitioner
+                    </span>
+                  )}
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.75)', fontSize: '12px', fontWeight: 500, padding: '3px 10px', borderRadius: '20px' }}>
+                    ✓ Profile reviewed
                   </span>
-                )}
+                </div>
               </div>
             </div>
-
-            {/* Availability panel */}
             {av && (
               <div style={{ background: avBg, borderRadius: '12px', padding: '1.25rem 1.5rem', minWidth: '220px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -95,20 +93,16 @@ export default async function AssessorProfilePage({ params }: Props) {
                 </p>
               </div>
             )}
-
           </div>
         </Container>
       </div>
 
-      {/* Body */}
       <Section>
         <Container>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)', gap: '24px', alignItems: 'start' }}>
 
-            {/* Left column */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-              {/* Quick summary */}
               <Card title="Quick summary">
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   {[
@@ -125,7 +119,6 @@ export default async function AssessorProfilePage({ params }: Props) {
                 </div>
               </Card>
 
-              {/* Bio */}
               {assessor.bio && (
                 <Card title="About">
                   <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.75, margin: 0 }}>
@@ -134,7 +127,6 @@ export default async function AssessorProfilePage({ params }: Props) {
                 </Card>
               )}
 
-              {/* Assessment details */}
               <Card title="Assessment details">
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                   {assessor.conditions.map((c) => <Tag key={c} label={c} />)}
@@ -142,14 +134,26 @@ export default async function AssessorProfilePage({ params }: Props) {
                 </div>
               </Card>
 
-              {/* Credentials */}
-              <Card title="Credentials">
+              <Card title="Credentials and verification">
+                <div style={{ background: '#f0fdf4', border: '0.5px solid #86efac', borderRadius: '8px', padding: '12px 14px', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '18px' }}>✓</span>
+                  <div>
+                    <p style={{ fontSize: '13px', fontWeight: 500, color: '#166534', margin: '0 0 2px' }}>
+                      {assessor.is_verified ? 'Verified practitioner' : 'Profile reviewed'}
+                    </p>
+                    <p style={{ fontSize: '12px', color: '#166534', margin: 0, opacity: 0.8 }}>
+                      {assessor.is_verified
+                        ? 'Identity and credentials have been checked by Assessment Finder.'
+                        : 'This profile has been reviewed before publication.'}
+                    </p>
+                  </div>
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {assessor.governing_body && <Row label="Governing body" value={assessor.governing_body} />}
                   {assessor.registration_number && <Row label="Registration no." value={assessor.registration_number} />}
                   <Row
-                    label="Verified"
-                    value={assessor.is_verified ? '✓ Identity and credentials checked' : 'Not yet verified'}
+                    label="Status"
+                    value={assessor.is_verified ? '✓ Fully verified' : 'Profile reviewed'}
                     valueColor={assessor.is_verified ? '#166534' : '#6b7280'}
                   />
                 </div>
@@ -157,10 +161,8 @@ export default async function AssessorProfilePage({ params }: Props) {
 
             </div>
 
-            {/* Right column */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-              {/* Price */}
               {assessor.price_range && (
                 <Card title="Price range">
                   <p style={{ fontSize: '24px', fontWeight: 500, color: '#1a3a5c', margin: '0 0 6px' }}>
@@ -172,7 +174,6 @@ export default async function AssessorProfilePage({ params }: Props) {
                 </Card>
               )}
 
-              {/* Contact form — sticky */}
               <div style={{ position: 'sticky', top: '1rem' }}>
                 <Card title={`Contact ${assessor.name.split(' ')[0]}`}>
                   <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 1rem', lineHeight: 1.5 }}>

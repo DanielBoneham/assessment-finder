@@ -28,13 +28,28 @@ export default async function HomePage() {
           <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '28px', marginTop: '2rem' }}>
             {[
               { value: '10+', label: 'Assessors listed' },
-              { value: 'Weekly', label: 'Availability updates' },
+              { value: 'Verified', label: 'Profiles reviewed before publication' },
               { value: 'Free', label: 'To search and contact' },
             ].map((stat) => (
               <div key={stat.label} style={{ textAlign: 'center' }}>
                 <p style={{ color: '#4ade80', fontSize: '20px', fontWeight: 500, margin: '0 0 2px' }}>{stat.value}</p>
                 <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', margin: 0 }}>{stat.label}</p>
               </div>
+            ))}
+          </div>
+        </Container>
+      </div>
+
+      <div style={{ background: '#fff', borderBottom: '0.5px solid #e5e7eb' }}>
+        <Container>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '24px', padding: '14px 0' }}>
+            {[
+              '✓ All profiles reviewed before publication',
+              '✓ Registered with BPS, HCPC or GMC',
+              '✓ Real availability shown',
+              '✓ Contact assessors directly',
+            ].map((item) => (
+              <span key={item} style={{ fontSize: '13px', color: '#374151', fontWeight: 500 }}>{item}</span>
             ))}
           </div>
         </Container>
@@ -85,9 +100,6 @@ export default async function HomePage() {
             </p>
             <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
               NHS waiting times can often exceed 6 to 12 months in many areas. Private assessments are typically much faster, with availability ranging from a few weeks to a few months.
-            </p>
-            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
-              The time it takes to complete an assessment also varies, but most private ADHD assessments are completed within one to three appointments.
             </p>
             <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
               Because availability differs between providers, many people choose to compare assessors to find those with shorter waiting times.
