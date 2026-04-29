@@ -39,7 +39,7 @@ export function PageLayout({ children }: PageLayoutProps) {
           </span>
         </a>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <a href="/" style={navLink}>Find Assessments</a>
 
           <div style={{ position: 'relative' }}>
@@ -49,7 +49,6 @@ export function PageLayout({ children }: PageLayoutProps) {
             >
               Locations <span style={{ fontSize: '10px' }}>▼</span>
             </button>
-
             {locationsOpen && (
               <div style={{ position: 'absolute', top: '32px', left: '50%', transform: 'translateX(-50%)', background: '#fff', borderRadius: '10px', border: '0.5px solid #d1dce8', padding: '8px', minWidth: '200px', boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}>
                 {locations.map((loc) => (
@@ -67,8 +66,13 @@ export function PageLayout({ children }: PageLayoutProps) {
 
           <a href="/articles" style={navLink}>Articles</a>
 
-          <a href="/list-your-practice" style={{ color: '#1a3a5c', background: '#4ade80', fontSize: '13px', fontWeight: 500, textDecoration: 'none', padding: '7px 14px', borderRadius: '8px' }}>
-            For Assessors
+          <a href="/list-your-practice" style={navLink}>For Assessors</a>
+
+          
+            href="/list-your-practice"
+            style={{ color: '#1a3a5c', background: '#4ade80', fontSize: '13px', fontWeight: 600, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px', whiteSpace: 'nowrap' }}
+          >
+            List your practice →
           </a>
         </div>
       </nav>

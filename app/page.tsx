@@ -16,6 +16,7 @@ export default async function HomePage() {
   return (
     <PageLayout>
 
+      {/* Hero */}
       <div style={{ background: '#1a3a5c', padding: '3.5rem 0 4.5rem' }}>
         <Container style={{ textAlign: 'center' }}>
           <h1 style={{ color: '#fff', fontSize: '32px', fontWeight: 500, lineHeight: 1.3, maxWidth: '600px', margin: '0 auto 1rem' }}>
@@ -40,6 +41,7 @@ export default async function HomePage() {
         </Container>
       </div>
 
+      {/* Trust bar */}
       <div style={{ background: '#fff', borderBottom: '0.5px solid #e5e7eb' }}>
         <Container>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '24px', padding: '14px 0' }}>
@@ -55,6 +57,7 @@ export default async function HomePage() {
         </Container>
       </div>
 
+      {/* How it works */}
       <Section>
         <Container>
           <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1.5rem', textAlign: 'center' }}>
@@ -78,6 +81,7 @@ export default async function HomePage() {
         </Container>
       </Section>
 
+      {/* Assessor grid */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           {error && (
@@ -89,6 +93,29 @@ export default async function HomePage() {
         </Container>
       </Section>
 
+      {/* For Assessors CTA */}
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          <div style={{ background: '#1a3a5c', borderRadius: '12px', padding: '2rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
+            <div>
+              <p style={{ color: '#fff', fontSize: '18px', fontWeight: 500, margin: '0 0 6px' }}>
+                Are you an assessor?
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', margin: 0 }}>
+                List your practice for free and get discovered by people searching for assessments near them.
+              </p>
+            </div>
+            
+              href="/list-your-practice"
+              style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '14px', fontWeight: 600, padding: '12px 24px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap' }}
+            >
+              List your practice →
+            </a>
+          </div>
+        </Container>
+      </Section>
+
+      {/* SEO block */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
