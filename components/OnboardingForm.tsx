@@ -44,24 +44,22 @@ export function OnboardingForm() {
     setErrorMessage('')
 
     try {
-      const insertData = {
-        name: form.name,
-        email: form.email,
-        location_city: form.location_city,
-        professional_title: form.professional_title,
-        governing_body: form.governing_body || null,
-        registration_number: form.registration_number || null,
-        bio: form.bio || null,
-        price_range: form.price_range || null,
-        conditions: form.conditions,
-        assessment_types: form.assessment_types,
-        is_verified: false,
-        tier: 'free',
-      }
-
       const { data: assessor, error: assessorError } = await supabase
         .from('assessors')
-        .insert(insertData)
+        .insert({
+          name: form.name,
+          email: form.email,
+          location_city: form.location_city,
+          professional_title: form.professional_title,
+          governing_body: form.governing_body || null,
+          registration_number: form.registration_number || null,
+          bio: form.bio || null,
+          price_range: form.price_range || null,
+          conditions: form.conditions,
+          assessment_types: form.assessment_types,
+          is_verified: false,
+          tier: 'free',
+        })
         .select()
         .single()
 
@@ -96,84 +94,83 @@ export function OnboardingForm() {
   if (status === 'success') {
     return (
       <div style={{ background: '#dcfce7', border: '0.5px solid #86efac', borderRadius: '12px', padding: '2.5rem', textAlign: 'center' }}>
-        <p style={{ fontSize: '22px', marginBottom: '8px' }}>✓</p>
-        <p style={{ fontSize: '18px', fontWeight: 500, color: '#166534', margin: '0 0 8px' }}>
-          Thanks — your profile has been submitted for review.
+        <div style={{ fontSize: '32px', marginBottom: '12px' }}>✓</div>
+        <p style={{ fontSize: '20px', fontWeight: 500, color: '#166534', margin: '0 0 8px' }}>
+          Profile submitted successfully
         </p>
-        <p style={{ fontSize: '14px', color: '#166534', margin: 0, opacity: 0.8 }}>
-          We will be in touch within 2 working days.
+        <p style={{ fontSize: '14px', color: '#166534', margin: 0, opacity: 0.85 }}>
+          Thanks for joining Assessment Finder. We will review your profile and be in touch within 2 working days.
         </p>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem', marginBottom: '16px' }}>
-        <SectionTitle>Basic information</SectionTitle>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-            <Field label="Full name" required>
-              <input name="name" required value={form.name} onChange={handleChange} placeholder="Dr Jane Smith" style={inputStyle} />
-            </Field>
-            <Field label="Email address" required>
-              <input name="email" type="email" required value={form.email} onChange={handleChange} placeholder="jane@example.com" style={inputStyle} />
-            </Field>
-          </div>
-          <Field label="Location (city)" required>
-            <input name="location_city" required value={form.location_city} onChange={handleChange} placeholder="e.g. London" style={inputStyle} />
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+      {/* Basic information */}
+      <FormSection title="Basic information">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <Field label="Full name" required>
+            <input name="name" required value={form.name} onChange={handleChange} placeholder="Dr Jane Smith" style={inputStyle} />
+          </Field>
+          <Field label="Email address" required>
+            <input name="email" type="email" required value={form.email} onChange={handleChange} placeholder="jane@example.com" style={inputStyle} />
           </Field>
         </div>
-      </div>
+        <Field label="City or location" required hint="This is where your practice is based">
+          <input name="location_city" required value={form.location_city} onChange={handleChange} placeholder="e.g. London" style={inputStyle} />
+        </Field>
+      </FormSection>
 
-      <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem', marginBottom: '16px' }}>
-        <SectionTitle>Professional information</SectionTitle>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <Field label="Professional title" required>
-            <input name="professional_title" required value={form.professional_title} onChange={handleChange} placeholder="e.g. Clinical Psychologist" style={inputStyle} />
+      {/* Professional credentials */}
+      <FormSection title="Professional credentials">
+        <Field label="Professional title" required hint="e.g. Clinical Psychologist, Consultant Psychiatrist">
+          <input name="professional_title" required value={form.professional_title} onChange={handleChange} placeholder="e.g. Clinical Psychologist" style={inputStyle} />
+        </Field>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <Field label="Governing body" hint="e.g. BPS, HCPC, GMC">
+            <input name="governing_body" value={form.governing_body} onChange={handleChange} placeholder="e.g. BPS" style={inputStyle} />
           </Field>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-            <Field label="Governing body">
-              <input name="governing_body" value={form.governing_body} onChange={handleChange} placeholder="e.g. BPS, HCPC, GMC" style={inputStyle} />
-            </Field>
-            <Field label="Registration number">
-              <input name="registration_number" value={form.registration_number} onChange={handleChange} placeholder="e.g. 123456" style={inputStyle} />
-            </Field>
-          </div>
+          <Field label="Registration number">
+            <input name="registration_number" value={form.registration_number} onChange={handleChange} placeholder="e.g. 123456" style={inputStyle} />
+          </Field>
         </div>
-      </div>
+      </FormSection>
 
-      <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem', marginBottom: '16px' }}>
-        <SectionTitle>Services</SectionTitle>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Services */}
+      <FormSection title="Services">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           <div>
-            <p style={labelStyle}>Conditions offered</p>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <p style={fieldLabelStyle}>Conditions you assess for</p>
+            <p style={hintStyle}>Select all that apply</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '8px' }}>
               {['ADHD', 'Autism', 'Dyslexia'].map((c) => (
-                <label key={c} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#374151' }}>
-                  <input type="checkbox" checked={form.conditions.includes(c)} onChange={() => handleCheckbox('conditions', c)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
-                  {c}
+                <label key={c} style={checkboxLabel(form.conditions.includes(c))}>
+                  <input type="checkbox" checked={form.conditions.includes(c)} onChange={() => handleCheckbox('conditions', c)} style={{ display: 'none' }} />
+                  {form.conditions.includes(c) ? '✓ ' : ''}{c}
                 </label>
               ))}
             </div>
           </div>
           <div>
-            <p style={labelStyle}>Assessment types</p>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <p style={fieldLabelStyle}>Assessment types</p>
+            <p style={hintStyle}>Select all that apply</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '8px' }}>
               {['Adults', 'Children', 'Remote'].map((t) => (
-                <label key={t} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#374151' }}>
-                  <input type="checkbox" checked={form.assessment_types.includes(t)} onChange={() => handleCheckbox('assessment_types', t)} style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
-                  {t}
+                <label key={t} style={checkboxLabel(form.assessment_types.includes(t))}>
+                  <input type="checkbox" checked={form.assessment_types.includes(t)} onChange={() => handleCheckbox('assessment_types', t)} style={{ display: 'none' }} />
+                  {form.assessment_types.includes(t) ? '✓ ' : ''}{t}
                 </label>
               ))}
             </div>
           </div>
         </div>
-      </div>
+      </FormSection>
 
-      <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem', marginBottom: '16px' }}>
-        <SectionTitle>Availability</SectionTitle>
-        <Field label="Current availability" required>
+      {/* Availability */}
+      <FormSection title="Current availability">
+        <Field label="How soon can you take on new clients?" required>
           <select name="availability_range" required value={form.availability_range} onChange={handleChange} style={inputStyle}>
             <option value="">Select availability</option>
             <option value="within-2-weeks">Within 2 weeks</option>
@@ -182,22 +179,27 @@ export function OnboardingForm() {
             <option value="3-plus-months">3 or more months</option>
           </select>
         </Field>
-      </div>
+      </FormSection>
 
-      <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem', marginBottom: '16px' }}>
-        <SectionTitle>Profile</SectionTitle>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <Field label="Short bio">
-            <textarea name="bio" value={form.bio} onChange={handleChange} placeholder="Tell potential clients about your experience and approach..." rows={4} style={{ ...inputStyle, height: 'auto', resize: 'vertical' }} />
-          </Field>
-          <Field label="Price range">
-            <input name="price_range" value={form.price_range} onChange={handleChange} placeholder="e.g. £800 to £1,200" style={inputStyle} />
-          </Field>
-        </div>
-      </div>
+      {/* Profile details */}
+      <FormSection title="Profile details">
+        <Field label="Short bio" hint="Tell potential clients about your experience and approach">
+          <textarea
+            name="bio"
+            value={form.bio}
+            onChange={handleChange}
+            placeholder="e.g. Specialist in adult ADHD and autism assessments with 10 years of clinical experience..."
+            rows={4}
+            style={{ ...inputStyle, height: 'auto', resize: 'vertical', padding: '10px 12px' }}
+          />
+        </Field>
+        <Field label="Price range" hint="e.g. £800 to £1,200">
+          <input name="price_range" value={form.price_range} onChange={handleChange} placeholder="e.g. £800 to £1,200" style={inputStyle} />
+        </Field>
+      </FormSection>
 
       {status === 'error' && (
-        <div style={{ fontSize: '13px', color: '#991b1b', background: '#fee2e2', padding: '10px 14px', borderRadius: '8px', marginBottom: '14px' }}>
+        <div style={{ fontSize: '13px', color: '#991b1b', background: '#fee2e2', padding: '12px 14px', borderRadius: '8px' }}>
           <strong>Error:</strong> {errorMessage || 'Something went wrong. Please try again.'}
         </div>
       )}
@@ -205,48 +207,75 @@ export function OnboardingForm() {
       <button
         type="submit"
         disabled={status === 'submitting'}
-        style={{ width: '100%', height: '48px', background: '#1a3a5c', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: 500, cursor: status === 'submitting' ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: status === 'submitting' ? 0.7 : 1 }}
+        style={{ width: '100%', height: '50px', background: '#1a3a5c', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '16px', fontWeight: 600, cursor: status === 'submitting' ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: status === 'submitting' ? 0.7 : 1, letterSpacing: '-0.2px' }}
       >
-        {status === 'submitting' ? 'Submitting...' : 'Submit your profile'}
+        {status === 'submitting' ? 'Submitting...' : 'Create your free profile'}
       </button>
 
-      <p style={{ fontSize: '12px', color: '#9ca3af', textAlign: 'center', marginTop: '12px' }}>
-        We will review your details and be in touch within 2 working days.
+      <p style={{ fontSize: '12px', color: '#9ca3af', textAlign: 'center', margin: 0 }}>
+        We will review your details and be in touch within 2 working days. No payment required.
       </p>
+
     </form>
   )
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <h2 style={{ fontSize: '15px', fontWeight: 500, color: '#111827', margin: '0 0 1rem', paddingBottom: '0.75rem', borderBottom: '0.5px solid #e5e7eb' }}>
-      {children}
-    </h2>
-  )
-}
-
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
-  return (
-    <div>
-      <label style={labelStyle}>
-        {label}{required && <span style={{ color: '#ef4444', marginLeft: '3px' }}>*</span>}
-      </label>
+    <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#1a3a5c', margin: 0, paddingBottom: '0.75rem', borderBottom: '0.5px solid #e5e7eb', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+        {title}
+      </h3>
       {children}
     </div>
   )
 }
 
-const labelStyle: React.CSSProperties = {
-  display: 'block',
+function Field({ label, required, hint, children }: { label: string; required?: boolean; hint?: string; children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <label style={fieldLabelStyle}>
+        {label}{required && <span style={{ color: '#ef4444', marginLeft: '3px' }}>*</span>}
+      </label>
+      {hint && <p style={hintStyle}>{hint}</p>}
+      {children}
+    </div>
+  )
+}
+
+function checkboxLabel(selected: boolean): React.CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '8px 16px',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: selected ? 500 : 400,
+    cursor: 'pointer',
+    border: selected ? '1.5px solid #1a3a5c' : '0.5px solid #d1d5db',
+    background: selected ? '#e8f0fa' : '#fff',
+    color: selected ? '#1a3a5c' : '#374151',
+    transition: 'all 0.1s',
+    userSelect: 'none',
+  }
+}
+
+const fieldLabelStyle: React.CSSProperties = {
   fontSize: '13px',
   fontWeight: 500,
   color: '#374151',
-  marginBottom: '6px',
+  margin: 0,
+}
+
+const hintStyle: React.CSSProperties = {
+  fontSize: '12px',
+  color: '#9ca3af',
+  margin: 0,
 }
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  height: '42px',
+  height: '44px',
   border: '0.5px solid #d1d5db',
   borderRadius: '8px',
   padding: '0 12px',
