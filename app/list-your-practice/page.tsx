@@ -11,6 +11,7 @@ export default function ListYourPracticePage() {
   return (
     <PageLayout>
 
+      {/* Hero */}
       <div style={{ background: '#1a3a5c', padding: '3.5rem 0 4.5rem' }}>
         <Container style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block', background: 'rgba(74,222,128,0.15)', border: '0.5px solid rgba(74,222,128,0.4)', borderRadius: '20px', padding: '5px 14px', marginBottom: '1.25rem' }}>
@@ -21,10 +22,24 @@ export default function ListYourPracticePage() {
           <h1 style={{ color: '#fff', fontSize: '30px', fontWeight: 500, lineHeight: 1.3, maxWidth: '580px', margin: '0 auto 1rem' }}>
             Get more assessment enquiries by showing your real availability
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '16px', maxWidth: '500px', margin: '0 auto 1.5rem', lineHeight: 1.7 }}>
+          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '16px', maxWidth: '500px', margin: '0 auto 2rem', lineHeight: 1.7 }}>
             Join Assessment Finder and connect with people actively searching for ADHD, autism and dyslexia assessments. Early members get priority visibility at no cost.
           </p>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.08)', border: '0.5px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '10px 16px' }}>
+
+          {/* Primary CTA */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+            
+              href="#create-profile"
+              style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '16px', fontWeight: 700, padding: '14px 32px', borderRadius: '10px', textDecoration: 'none', letterSpacing: '-0.2px' }}
+            >
+              Create your free profile
+            </a>
+            <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '12px', margin: 0 }}>
+              Join early for free premium visibility · No payment required
+            </p>
+          </div>
+
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.08)', border: '0.5px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '10px 16px', marginTop: '1.5rem' }}>
             <span style={{ color: '#4ade80', fontSize: '14px' }}>✓</span>
             <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px' }}>
               All profiles reviewed before publication to ensure quality and professional standards.
@@ -86,30 +101,22 @@ export default function ListYourPracticePage() {
       {/* Profile preview */}
       <Section style={{ paddingTop: 0 }}>
         <Container style={{ maxWidth: '720px' }}>
-          <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1.25rem', textAlign: 'center' }}>
+          <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '0.75rem', textAlign: 'center' }}>
             Example profile
           </p>
           <p style={{ fontSize: '14px', color: '#6b7280', textAlign: 'center', margin: '0 0 1.5rem' }}>
             This is what your public profile could look like on Assessment Finder.
           </p>
-
-          {/* Profile hero preview */}
           <div style={{ background: '#1a3a5c', borderRadius: '12px', padding: '1.75rem', marginBottom: '14px' }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1.25rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#e8f0fa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px', flexShrink: 0, border: '2px solid rgba(255,255,255,0.2)' }}>
-                  👤
-                </div>
+                <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#e8f0fa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px', flexShrink: 0, border: '2px solid rgba(255,255,255,0.2)' }}>👤</div>
                 <div>
                   <p style={{ color: '#fff', fontSize: '18px', fontWeight: 500, margin: '0 0 3px' }}>Dr Sarah Mitchell</p>
                   <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px', margin: '0 0 8px' }}>Clinical Psychologist · London</p>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(74,222,128,0.2)', color: '#4ade80', fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', border: '0.5px solid rgba(74,222,128,0.4)' }}>
-                      ✓ Verified practitioner
-                    </span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', fontSize: '11px', padding: '3px 10px', borderRadius: '20px' }}>
-                      ✓ Profile reviewed
-                    </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(74,222,128,0.2)', color: '#4ade80', fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', border: '0.5px solid rgba(74,222,128,0.4)' }}>✓ Verified practitioner</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', fontSize: '11px', padding: '3px 10px', borderRadius: '20px' }}>✓ Profile reviewed</span>
                   </div>
                 </div>
               </div>
@@ -123,8 +130,6 @@ export default function ListYourPracticePage() {
               </div>
             </div>
           </div>
-
-          {/* Quick summary + bio */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
             <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.25rem' }}>
               <p style={{ fontSize: '11px', fontWeight: 600, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.7px', margin: '0 0 10px', paddingBottom: '8px', borderBottom: '0.5px solid #e5e7eb' }}>Quick summary</p>
@@ -150,16 +155,13 @@ export default function ListYourPracticePage() {
               </p>
             </div>
           </div>
-
-          {/* Verification banner */}
-          <div style={{ background: '#f0fdf4', borderRadius: '10px', border: '1px solid #86efac', padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
+          <div style={{ background: '#f0fdf4', borderRadius: '10px', border: '1px solid #86efac', padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '14px' }}>✓</div>
             <div>
               <p style={{ fontSize: '13px', fontWeight: 600, color: '#166534', margin: '0 0 2px' }}>Verified practitioner</p>
               <p style={{ fontSize: '12px', color: '#166534', margin: 0, opacity: 0.8 }}>Identity and credentials checked by Assessment Finder. Registered with BPS — No. 123456.</p>
             </div>
           </div>
-
           <p style={{ fontSize: '12px', color: '#9ca3af', textAlign: 'center', marginTop: '10px', marginBottom: 0 }}>
             Example only — your profile will reflect your own details and credentials.
           </p>
@@ -196,14 +198,17 @@ export default function ListYourPracticePage() {
       </Section>
 
       {/* Form */}
-      <Section style={{ paddingTop: 0 }}>
+      <Section style={{ paddingTop: 0 }} >
         <Container style={{ maxWidth: '640px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <div id="create-profile" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
             <h2 style={{ fontSize: '22px', fontWeight: 500, color: '#111827', margin: '0 0 8px' }}>
               Create your free profile
             </h2>
-            <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
+            <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 6px' }}>
               Takes around 5 minutes. We will be in touch within 2 working days.
+            </p>
+            <p style={{ fontSize: '13px', color: '#4ade80', fontWeight: 500, margin: 0, background: '#1a3a5c', display: 'inline-block', padding: '4px 14px', borderRadius: '20px' }}>
+              Join early for free premium visibility
             </p>
           </div>
           <OnboardingForm />
