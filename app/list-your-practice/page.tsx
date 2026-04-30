@@ -25,20 +25,14 @@ export default function ListYourPracticePage() {
           <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '16px', maxWidth: '500px', margin: '0 auto 2rem', lineHeight: 1.7 }}>
             Join Assessment Finder and connect with people actively searching for ADHD, autism and dyslexia assessments. Early members get priority visibility at no cost.
           </p>
-
-          {/* Primary CTA */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-            
-              href="#create-profile"
-              style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '16px', fontWeight: 700, padding: '14px 32px', borderRadius: '10px', textDecoration: 'none', letterSpacing: '-0.2px' }}
-            >
+            <a href="#create-profile" style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '16px', fontWeight: 700, padding: '14px 32px', borderRadius: '10px', textDecoration: 'none' }}>
               Create your free profile
             </a>
             <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '12px', margin: 0 }}>
               Join early for free premium visibility · No payment required
             </p>
           </div>
-
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.08)', border: '0.5px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '10px 16px', marginTop: '1.5rem' }}>
             <span style={{ color: '#4ade80', fontSize: '14px' }}>✓</span>
             <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px' }}>
@@ -168,8 +162,42 @@ export default function ListYourPracticePage() {
         </Container>
       </Section>
 
-      {/* Trust section */}
+      {/* FAQ */}
       <Section style={{ paddingTop: '1.5rem' }}>
+        <Container style={{ maxWidth: '640px' }}>
+          <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1.25rem', textAlign: 'center' }}>
+            Frequently asked questions
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '2rem' }}>
+            {[
+              {
+                q: 'How does Assessment Finder work?',
+                a: 'Assessment Finder is a directory of private ADHD, autism and dyslexia assessors across the UK. People searching for an assessor can browse by location and condition, view your profile, and contact you directly. You control your own availability and profile information.',
+              },
+              {
+                q: 'Is my profile reviewed before it goes live?',
+                a: 'Yes. Every profile is reviewed by our team before publication. We check your professional credentials and governing body registration to ensure quality and trust across the directory.',
+              },
+              {
+                q: 'How much does it cost?',
+                a: 'Listing your profile is completely free for early adopters. Assessors who join now receive premium placement in search results at no cost, for as long as they remain listed. No payment card required.',
+              },
+              {
+                q: 'Can I update my availability later?',
+                a: 'Yes. Once your profile is live, you can contact us to update your availability at any time. We are working on a self-service dashboard so you can manage this yourself in the future.',
+              },
+            ].map((item) => (
+              <div key={item.q} style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.25rem 1.5rem' }}>
+                <p style={{ fontSize: '15px', fontWeight: 500, color: '#111827', margin: '0 0 8px' }}>{item.q}</p>
+                <p style={{ fontSize: '14px', color: '#6b7280', margin: 0, lineHeight: 1.7 }}>{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      {/* Trust section */}
+      <Section style={{ paddingTop: 0 }}>
         <Container style={{ maxWidth: '640px' }}>
           <div style={{ background: '#f0fdf4', borderRadius: '12px', border: '1px solid #86efac', padding: '1.75rem', marginBottom: '2rem' }}>
             <p style={{ fontSize: '13px', fontWeight: 500, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 1rem' }}>
@@ -198,7 +226,7 @@ export default function ListYourPracticePage() {
       </Section>
 
       {/* Form */}
-      <Section style={{ paddingTop: 0 }} >
+      <Section style={{ paddingTop: 0 }}>
         <Container style={{ maxWidth: '640px' }}>
           <div id="create-profile" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
             <h2 style={{ fontSize: '22px', fontWeight: 500, color: '#111827', margin: '0 0 8px' }}>
