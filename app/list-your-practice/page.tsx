@@ -35,30 +35,41 @@ export default function ListYourPracticePage() {
 
       <Section>
         <Container>
+
           <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1.25rem', textAlign: 'center' }}>
             What you get
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '2.5rem' }}>
             {[
               {
-                icon: '🔝',
-                title: 'Priority visibility',
-                body: 'Early members appear at the top of search results in their area, ahead of later listings.',
+                icon: '🔍',
+                title: 'Be discovered',
+                body: 'Be found by people actively searching for ADHD, autism and dyslexia assessments in your area.',
               },
               {
                 icon: '📅',
-                title: 'Availability highlighting',
-                body: 'Your availability is shown prominently on every card and profile so clients can see at a glance if you can help them.',
+                title: 'Highlight your availability',
+                body: 'Show your current availability prominently so clients can see at a glance whether you can help them soon.',
               },
               {
                 icon: '📍',
-                title: 'Increased local discovery',
-                body: 'Your profile appears on dedicated location pages like "ADHD assessment London" — exactly where people are searching.',
+                title: 'Improve local visibility',
+                body: 'Your profile appears on location pages like "ADHD assessment London" — exactly where people are already looking.',
               },
               {
-                icon: '✉️',
-                title: 'Direct client contact',
-                body: 'Clients can message you directly through your profile. No middlemen, no delays.',
+                icon: '✅',
+                title: 'Reduce unnecessary admin',
+                body: 'Fewer back-and-forth enquiries. Clients can see your availability before they contact you.',
+              },
+              {
+                icon: '🏅',
+                title: 'Build trust with verified credentials',
+                body: 'Display your governing body registration and earn a verified badge that helps clients feel confident choosing you.',
+              },
+              {
+                icon: '🔝',
+                title: 'Free premium placement for early adopters',
+                body: 'Assessors who join now receive priority placement in search results at no cost — for as long as they remain listed.',
               },
             ].map((benefit) => (
               <div key={benefit.title} style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
@@ -123,6 +134,7 @@ export default function ListYourPracticePage() {
               ))}
             </div>
           </div>
+
         </Container>
       </Section>
 
