@@ -41,36 +41,12 @@ export default function ListYourPracticePage() {
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '2.5rem' }}>
             {[
-              {
-                icon: '🔍',
-                title: 'Be discovered',
-                body: 'Be found by people actively searching for ADHD, autism and dyslexia assessments in your area.',
-              },
-              {
-                icon: '📅',
-                title: 'Highlight your availability',
-                body: 'Show your current availability prominently so clients can see at a glance whether you can help them soon.',
-              },
-              {
-                icon: '📍',
-                title: 'Improve local visibility',
-                body: 'Your profile appears on location pages like "ADHD assessment London" — exactly where people are already looking.',
-              },
-              {
-                icon: '✅',
-                title: 'Reduce unnecessary admin',
-                body: 'Fewer back-and-forth enquiries. Clients can see your availability before they contact you.',
-              },
-              {
-                icon: '🏅',
-                title: 'Build trust with verified credentials',
-                body: 'Display your governing body registration and earn a verified badge that helps clients feel confident choosing you.',
-              },
-              {
-                icon: '🔝',
-                title: 'Free premium placement for early adopters',
-                body: 'Assessors who join now receive priority placement in search results at no cost — for as long as they remain listed.',
-              },
+              { icon: '🔍', title: 'Be discovered', body: 'Be found by people actively searching for ADHD, autism and dyslexia assessments in your area.' },
+              { icon: '📅', title: 'Highlight your availability', body: 'Show your current availability prominently so clients can see at a glance whether you can help them soon.' },
+              { icon: '📍', title: 'Improve local visibility', body: 'Your profile appears on location pages like "ADHD assessment London" — exactly where people are already looking.' },
+              { icon: '✅', title: 'Reduce unnecessary admin', body: 'Fewer back-and-forth enquiries. Clients can see your availability before they contact you.' },
+              { icon: '🏅', title: 'Build trust with verified credentials', body: 'Display your governing body registration and earn a verified badge that helps clients feel confident choosing you.' },
+              { icon: '🔝', title: 'Free premium placement for early adopters', body: 'Assessors who join now receive priority placement in search results at no cost — for as long as they remain listed.' },
             ].map((benefit) => (
               <div key={benefit.title} style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
                 <div style={{ fontSize: '22px', marginBottom: '0.75rem' }}>{benefit.icon}</div>
@@ -93,9 +69,7 @@ export default function ListYourPracticePage() {
                 <p style={{ fontSize: '11px', color: '#166534', margin: '0 0 0 16px', opacity: 0.75 }}>Updated today</p>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#e8f0fa', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
-                  👤
-                </div>
+                <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#e8f0fa', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>👤</div>
                 <div>
                   <p style={{ fontSize: '14px', fontWeight: 500, color: '#111827', margin: 0 }}>Dr Jane Smith</p>
                   <p style={{ fontSize: '12px', color: '#6b7280', margin: '2px 0 0' }}>Clinical Psychologist</p>
@@ -138,6 +112,38 @@ export default function ListYourPracticePage() {
         </Container>
       </Section>
 
+      {/* Trust section */}
+      <Section style={{ paddingTop: 0 }}>
+        <Container style={{ maxWidth: '640px' }}>
+          <div style={{ background: '#f0fdf4', borderRadius: '12px', border: '1px solid #86efac', padding: '1.75rem', marginBottom: '2rem' }}>
+            <p style={{ fontSize: '13px', fontWeight: 500, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 1rem' }}>
+              Our commitment to quality
+            </p>
+            <p style={{ fontSize: '15px', fontWeight: 500, color: '#166534', margin: '0 0 1.25rem', lineHeight: 1.5 }}>
+              All profiles are reviewed before publication to ensure quality and professional standards.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {[
+                { icon: '✓', title: 'Verified profiles', body: 'We check governing body registration before approving any listing.' },
+                { icon: '✓', title: 'Professional standards', body: 'Only qualified assessors registered with BPS, HCPC, GMC or equivalent bodies are listed.' },
+                { icon: '✓', title: 'Increased user trust', body: 'Clients see verified badges on approved profiles, making them more likely to get in touch.' },
+              ].map((item) => (
+                <div key={item.title} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                  <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#dcfce7', color: '#166534', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {item.icon}
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '14px', fontWeight: 500, color: '#166534', margin: '0 0 2px' }}>{item.title}</p>
+                    <p style={{ fontSize: '13px', color: '#166534', margin: 0, opacity: 0.8, lineHeight: 1.5 }}>{item.body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      {/* Form */}
       <Section style={{ paddingTop: 0 }}>
         <Container style={{ maxWidth: '640px' }}>
           <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
