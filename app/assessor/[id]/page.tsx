@@ -1,278 +1,21 @@
-import { notFound } from 'next/navigation'
-import { getAssessorById } from '@/lib/api'
+import { getAssessors, AssessorWithAvailability, fastestAvailability } from '@/lib/api'
 import { PageLayout, Container, Section } from '@/components/Layout'
-import { ContactForm } from '@/components/ContactForm'
+import { AssessorGrid } from '@/components/AssessorGrid'
+import { HeroSearch } from '@/components/HeroSearch'
 
-interface Props {
-  params: Promise<{ id: string }>
+const AVAILABILITY_ORDER: Record<string, number> = {
+  'within-2-weeks': 0,
+  '2-4-weeks':      1,
+  '1-3-months':     2,
+  '3-plus-months':  3,
 }
 
-const AVAILABILITY_LABELS: Record<string, string> = {
-  'within-2-weeks': 'Available within 2 weeks',
-  '2-4-weeks':      'Available in 2 to 4 weeks',
-  '1-3-months':     'Available in 1 to 3 months',
-  '3-plus-months':  'Available in 3 or more months',
-}
-
-const AVAILABILITY_COLORS: Record<string, { bg: string; text: string; dot: string; border: string }> = {
-  'within-2-weeks': { bg: '#dcfce7', text: '#166534', dot: '#22c55e', border: '#86efac' },
-  '2-4-weeks':      { bg: '#dcfce7', text: '#166534', dot: '#22c55e', border: '#86efac' },
-  '1-3-months':     { bg: '#fef3c7', text: '#92400e', dot: '#f59e0b', border: '#fcd34d' },
-  '3-plus-months':  { bg: '#fee2e2', text: '#991b1b', dot: '#ef4444', border: '#fca5a5' },
-}
-
-function idToSeed(id: string): number {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) {
-    hash = (hash << 5) - hash + id.charCodeAt(i)
-    hash |= 0
-  }
-  return Math.abs(hash) % 70 + 1
-}
-
-function getPhotoUrl(id: string): string {
-  const seed = idToSeed(id)
-  const gender = seed % 2 === 0 ? 'women' : 'men'
-  return `https://randomuser.me/api/portraits/${gender}/${seed}.jpg`
-}
-
-export default async function AssessorProfilePage({ params }: Props) {
-  const { id } = await params
-  const assessor = await getAssessorById(id)
-  if (!assessor) notFound()
-
-  const av = assessor.availability
-  const avKey = av?.availability_range ?? '3-plus-months'
-  const avLabel = AVAILABILITY_LABELS[avKey]
-  const avColor = AVAILABILITY_COLORS[avKey]
-  const updatedAt = formatUpdatedAt(av?.last_updated)
-  const nextDate = av?.next_available_date ? formatDate(av.next_available_date) : null
-  const photoUrl = getPhotoUrl(id)
-  const firstName = assessor.name.split(' ')[0]
-
-  return (
-    <PageLayout>
-
-      {/* Hero */}
-      <div style={{ background: '#1a3a5c', padding: '2.5rem 0 3rem' }}>
-        <Container>
-          <a href="/" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', display: 'inline-block', marginBottom: '1.25rem' }}>
-            Back to all assessors
-          </a>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1.5rem' }}>
-
-            {/* Name + photo */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <img src={photoUrl} alt={assessor.name} style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.2)', flexShrink: 0 }} />
-              <div>
-                <h1 style={{ color: '#fff', fontSize: '24px', fontWeight: 500, margin: '0 0 4px' }}>
-                  {assessor.name}
-                </h1>
-                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', margin: '0 0 10px' }}>
-                  {assessor.professional_title} · {assessor.location_city}
-                </p>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {assessor.is_verified && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(74,222,128,0.2)', color: '#4ade80', fontSize: '12px', fontWeight: 600, padding: '4px 12px', borderRadius: '20px', border: '0.5px solid rgba(74,222,128,0.4)' }}>
-                      ✓ Verified practitioner
-                    </span>
-                  )}
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', fontSize: '12px', fontWeight: 500, padding: '4px 12px', borderRadius: '20px' }}>
-                    ✓ Profile reviewed
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Availability panel */}
-            {av && (
-              <div style={{ background: avColor.bg, border: `1px solid ${avColor.border}`, borderRadius: '12px', padding: '1.25rem 1.5rem', minWidth: '240px' }}>
-                <p style={{ fontSize: '11px', fontWeight: 600, color: avColor.text, textTransform: 'uppercase', letterSpacing: '0.7px', margin: '0 0 8px', opacity: 0.7 }}>
-                  Current availability
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: avColor.dot, flexShrink: 0 }} />
-                  <p style={{ fontSize: '17px', fontWeight: 700, color: avColor.text, margin: 0 }}>
-                    {avLabel}
-                  </p>
-                </div>
-                {nextDate && (
-                  <p style={{ fontSize: '13px', color: avColor.text, margin: '0 0 4px', opacity: 0.85 }}>
-                    Next available: <strong>{nextDate}</strong>
-                  </p>
-                )}
-                <p style={{ fontSize: '12px', color: avColor.text, margin: 0, opacity: 0.6 }}>
-                  Updated {updatedAt}
-                </p>
-              </div>
-            )}
-
-          </div>
-        </Container>
-      </div>
-
-      {/* Body */}
-      <Section>
-        <Container>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)', gap: '24px', alignItems: 'start' }}>
-
-            {/* Left column */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-              {/* Quick summary */}
-              <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
-                <h2 style={{ fontSize: '13px', fontWeight: 600, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 1rem', paddingBottom: '0.75rem', borderBottom: '0.5px solid #e5e7eb' }}>
-                  Quick summary
-                </h2>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  {[
-                    { label: 'Conditions', value: assessor.conditions.join(', ') || 'Not specified' },
-                    { label: 'Location', value: assessor.location_city },
-                    { label: 'Availability', value: avLabel ?? 'Contact for details' },
-                    { label: 'Assessment types', value: assessor.assessment_types.join(', ') || 'Not specified' },
-                    ...(assessor.price_range ? [{ label: 'Price range', value: assessor.price_range }] : []),
-                    ...(assessor.governing_body ? [{ label: 'Governing body', value: assessor.governing_body }] : []),
-                  ].map((item) => (
-                    <div key={item.label} style={{ background: '#f8fafc', borderRadius: '8px', padding: '12px' }}>
-                      <p style={{ fontSize: '11px', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 4px', fontWeight: 500 }}>{item.label}</p>
-                      <p style={{ fontSize: '14px', fontWeight: 500, color: '#111827', margin: 0 }}>{item.value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Verification */}
-              <div style={{ background: '#f0fdf4', borderRadius: '12px', border: '1px solid #86efac', padding: '1.25rem 1.5rem', display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '16px' }}>
-                  ✓
-                </div>
-                <div>
-                  <p style={{ fontSize: '14px', fontWeight: 600, color: '#166534', margin: '0 0 4px' }}>
-                    {assessor.is_verified ? 'Verified practitioner' : 'Profile reviewed before publication'}
-                  </p>
-                  <p style={{ fontSize: '13px', color: '#166534', margin: 0, opacity: 0.85, lineHeight: 1.5 }}>
-                    {assessor.is_verified
-                      ? 'Identity and professional credentials have been checked by Assessment Finder. This assessor is registered with a recognised governing body.'
-                      : 'This profile has been reviewed by the Assessment Finder team before being published on the directory.'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Bio */}
-              {assessor.bio && (
-                <Card title="About">
-                  <p style={{ fontSize: '15px', color: '#374151', lineHeight: 1.8, margin: 0 }}>
-                    {assessor.bio}
-                  </p>
-                </Card>
-              )}
-
-              {/* Assessment details */}
-              <Card title="Assessment details">
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {assessor.conditions.map((c) => <Tag key={c} label={c} />)}
-                  {assessor.assessment_types.map((t) => <Tag key={t} label={t} color="blue" />)}
-                </div>
-              </Card>
-
-              {/* Credentials */}
-              {(assessor.governing_body || assessor.registration_number) && (
-                <Card title="Credentials">
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {assessor.governing_body && <Row label="Governing body" value={assessor.governing_body} />}
-                    {assessor.registration_number && <Row label="Registration no." value={assessor.registration_number} />}
-                  </div>
-                </Card>
-              )}
-
-            </div>
-
-            {/* Right column */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-              {assessor.price_range && (
-                <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
-                  <p style={{ fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.7px', margin: '0 0 8px' }}>Price range</p>
-                  <p style={{ fontSize: '26px', fontWeight: 500, color: '#1a3a5c', margin: '0 0 6px' }}>
-                    {assessor.price_range}
-                  </p>
-                  <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>
-                    Prices may vary. Always confirm directly.
-                  </p>
-                </div>
-              )}
-
-              {/* Sticky contact form */}
-              <div style={{ position: 'sticky', top: '1rem' }}>
-                <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
-                  <h2 style={{ fontSize: '16px', fontWeight: 500, color: '#111827', margin: '0 0 6px' }}>
-                    Contact {firstName}
-                  </h2>
-                  <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 1.25rem', lineHeight: 1.5 }}>
-                    Send a message to enquire about availability or to arrange an appointment.
-                  </p>
-                  <ContactForm assessorId={assessor.id} assessorName={assessor.name} />
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* Mobile sticky CTA */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '0.5px solid #d1dce8', padding: '12px 1.5rem', display: 'flex', gap: '12px', alignItems: 'center', zIndex: 50 }}>
-        {av && (
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: '13px', fontWeight: 600, color: avColor.text, margin: 0 }}>{avLabel}</p>
-            <p style={{ fontSize: '11px', color: '#6b7280', margin: 0 }}>Updated {updatedAt}</p>
-          </div>
-        )}
-        
-          href="#contact-form"
-          style={{ background: '#1a3a5c', color: '#fff', fontSize: '14px', fontWeight: 500, padding: '11px 20px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap' }}
-        >
-          Contact assessor
-        </a>
-      </div>
-
-      <div style={{ height: '64px' }} />
-
-    </PageLayout>
-  )
-}
-
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
-      <h2 style={{ fontSize: '13px', fontWeight: 600, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 1rem', paddingBottom: '0.75rem', borderBottom: '0.5px solid #e5e7eb' }}>
-        {title}
-      </h2>
-      {children}
-    </div>
-  )
-}
-
-function Row({ label, value, valueColor = '#111827' }: { label: string; value: string; valueColor?: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid #f3f4f6', paddingBottom: '10px', gap: '12px' }}>
-      <span style={{ fontSize: '13px', color: '#9ca3af', flexShrink: 0 }}>{label}</span>
-      <span style={{ fontSize: '13px', fontWeight: 500, color: valueColor, textAlign: 'right' }}>{value}</span>
-    </div>
-  )
-}
-
-function Tag({ label, color = 'navy' }: { label: string; color?: 'navy' | 'blue' }) {
-  const styles = {
-    navy: { background: '#e8f0fa', color: '#1a3a5c' },
-    blue: { background: '#eff6ff', color: '#1d4ed8' },
-  }
-  return (
-    <span style={{ ...styles[color], fontSize: '12px', padding: '4px 12px', borderRadius: '20px', fontWeight: 500 }}>
-      {label}
-    </span>
-  )
+function sortByAvailability(assessors: AssessorWithAvailability[]): AssessorWithAvailability[] {
+  return [...assessors].sort((a, b) => {
+    const aO = AVAILABILITY_ORDER[a.availability?.availability_range ?? '3-plus-months'] ?? 3
+    const bO = AVAILABILITY_ORDER[b.availability?.availability_range ?? '3-plus-months'] ?? 3
+    return aO - bO
+  })
 }
 
 function formatUpdatedAt(timestamp?: string | null): string {
@@ -284,10 +27,265 @@ function formatUpdatedAt(timestamp?: string | null): string {
   return `${days} days ago`
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
+export default async function HomePage() {
+  let assessors: AssessorWithAvailability[] = []
+  let error = false
+
+  try {
+    assessors = await getAssessors()
+  } catch (e) {
+    error = true
+  }
+
+  const sorted = sortByAvailability(assessors)
+  const fastest = assessors.length > 0 ? fastestAvailability(assessors) : null
+  const featured = sorted.filter((a) => a.is_verified).slice(0, 3)
+  const recentlyUpdated = [...assessors]
+    .filter((a) => a.availability?.last_updated)
+    .sort((a, b) => new Date(b.availability!.last_updated).getTime() - new Date(a.availability!.last_updated).getTime())
+    .slice(0, 3)
+
+  return (
+    <PageLayout>
+
+      <div style={{ background: '#1a3a5c', padding: '3.5rem 0 4.5rem' }}>
+        <Container style={{ textAlign: 'center' }}>
+          <h1 style={{ color: '#fff', fontSize: '32px', fontWeight: 500, lineHeight: 1.3, maxWidth: '600px', margin: '0 auto 1rem' }}>
+            Find Private ADHD, Autism and Dyslexia Assessors Near You
+          </h1>
+          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '16px', maxWidth: '500px', margin: '0 auto 2rem', lineHeight: 1.7 }}>
+            See who has availability in the next few weeks. Compare assessors, check credentials, and get in touch directly.
+          </p>
+          <HeroSearch />
+
+          {fastest && (
+            <div style={{ marginTop: '1.75rem', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(74,222,128,0.15)', border: '0.5px solid rgba(74,222,128,0.4)', borderRadius: '10px', padding: '10px 20px' }}>
+              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#4ade80', flexShrink: 0 }} />
+              <p style={{ color: '#fff', fontSize: '15px', fontWeight: 500, margin: 0 }}>
+                Fastest current UK availability: <span style={{ color: '#4ade80' }}>{fastest}</span>
+              </p>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '28px', marginTop: '1.5rem' }}>
+            {[
+              { value: '10+', label: 'Assessors listed' },
+              { value: 'Verified', label: 'Profiles reviewed before publication' },
+              { value: 'Free', label: 'To search and contact' },
+            ].map((stat) => (
+              <div key={stat.label} style={{ textAlign: 'center' }}>
+                <p style={{ color: '#4ade80', fontSize: '20px', fontWeight: 500, margin: '0 0 2px' }}>{stat.value}</p>
+                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', margin: 0 }}>{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </div>
+
+      <div style={{ background: '#fff', borderBottom: '0.5px solid #e5e7eb' }}>
+        <Container>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '24px', padding: '14px 0' }}>
+            {[
+              '✓ All profiles reviewed before publication',
+              '✓ Registered with BPS, HCPC or GMC',
+              '✓ Real availability shown',
+              '✓ Contact assessors directly',
+            ].map((item) => (
+              <span key={item} style={{ fontSize: '13px', color: '#374151', fontWeight: 500 }}>{item}</span>
+            ))}
+          </div>
+        </Container>
+      </div>
+
+      <Section>
+        <Container>
+          <SectionLabel>How it works</SectionLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+            {[
+              { step: '1', title: 'Search by location', body: 'Enter your city and select the type of assessment you need.' },
+              { step: '2', title: 'Compare availability', body: 'Assessors are sorted by fastest availability so you can see who can help you soonest.' },
+              { step: '3', title: 'Contact directly', body: 'Send a message to the assessor and arrange your appointment.' },
+            ].map((item) => (
+              <div key={item.step} style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#e8f0fa', color: '#1a3a5c', fontSize: '14px', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                  {item.step}
+                </div>
+                <p style={{ fontSize: '15px', fontWeight: 500, color: '#111827', margin: '0 0 6px' }}>{item.title}</p>
+                <p style={{ fontSize: '14px', color: '#6b7280', margin: 0, lineHeight: 1.6 }}>{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      {featured.length > 0 && (
+        <Section style={{ paddingTop: 0 }}>
+          <Container>
+            <SectionLabel>Featured assessors</SectionLabel>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+              {featured.map((assessor) => (
+                <AssessorCard key={assessor.id} assessor={assessor} />
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
+
+      {recentlyUpdated.length > 0 && (
+        <Section style={{ paddingTop: 0 }}>
+          <Container>
+            <SectionLabel>Recently updated availability</SectionLabel>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+              {recentlyUpdated.map((assessor) => (
+                <AssessorCard key={assessor.id} assessor={assessor} />
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
+
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          <SectionLabel>Popular searches</SectionLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
+            {[
+              { label: 'ADHD assessment London', href: '/adhd-assessment-london' },
+              { label: 'ADHD assessment Manchester', href: '/adhd-assessment-manchester' },
+              { label: 'ADHD assessment Birmingham', href: '/adhd-assessment-birmingham' },
+              { label: 'Autism assessment London', href: '/autism-assessment-london' },
+              { label: 'Autism assessment Manchester', href: '/autism-assessment-manchester' },
+              { label: 'Dyslexia assessment London', href: '/dyslexia-assessment-london' },
+              { label: 'Dyslexia assessment Bristol', href: '/dyslexia-assessment-bristol' },
+              { label: 'ADHD assessment Leeds', href: '/adhd-assessment-leeds' },
+              { label: 'Autism assessment Birmingham', href: '/autism-assessment-birmingham' },
+            ].map((link) => (
+              <a key={link.href} href={link.href} style={{ textDecoration: 'none' }}>
+                <div style={{ background: '#fff', borderRadius: '10px', border: '0.5px solid #d1dce8', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', margin: 0 }}>{link.label}</p>
+                  <span style={{ color: '#9ca3af', fontSize: '14px', flexShrink: 0 }}>→</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          <SectionLabel>All assessors — sorted by fastest availability</SectionLabel>
+          {error && (
+            <p style={{ color: '#991b1b', fontSize: '14px', background: '#fee2e2', padding: '1rem', borderRadius: '8px', marginBottom: '1.25rem' }}>
+              Could not load assessors. Please check your Supabase connection.
+            </p>
+          )}
+          {!error && <AssessorGrid assessors={sorted} />}
+        </Container>
+      </Section>
+
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          <div style={{ background: '#1a3a5c', borderRadius: '12px', padding: '2rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
+            <div>
+              <p style={{ color: '#fff', fontSize: '18px', fontWeight: 500, margin: '0 0 6px' }}>Are you an assessor?</p>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', margin: 0 }}>
+                List your practice for free and get discovered by people searching for assessments near them.
+              </p>
+            </div>
+            <a href="/list-your-practice" style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '14px', fontWeight: 600, padding: '12px 24px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+              List your practice
+            </a>
+          </div>
+        </Container>
+      </Section>
+
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
+            <h2 style={{ fontSize: '17px', fontWeight: 500, margin: '0 0 1rem', color: '#111827' }}>
+              ADHD, autism and dyslexia assessments in the UK
+            </h2>
+            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+              ADHD assessment waiting times in the UK can vary significantly depending on whether you go through the NHS or a private provider.
+            </p>
+            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+              NHS waiting times can often exceed 6 to 12 months in many areas. Private assessments are typically much faster, with availability ranging from a few weeks to a few months.
+            </p>
+            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+              Because availability differs between providers, many people choose to compare assessors to find those with shorter waiting times.
+            </p>
+            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, margin: 0 }}>
+              Assessment Finder helps you identify assessors with current availability, so you can access support sooner.
+            </p>
+          </div>
+        </Container>
+      </Section>
+
+    </PageLayout>
+  )
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1.25rem' }}>
+      {children}
+    </p>
+  )
+}
+
+function AssessorCard({ assessor }: { assessor: AssessorWithAvailability }) {
+  const av = assessor.availability
+  const avKey = av?.availability_range ?? '3-plus-months'
+  const isGreen = avKey === 'within-2-weeks' || avKey === '2-4-weeks'
+  const bg = isGreen ? '#dcfce7' : avKey === '1-3-months' ? '#fef3c7' : '#fee2e2'
+  const text = isGreen ? '#166534' : avKey === '1-3-months' ? '#92400e' : '#991b1b'
+  const dot = isGreen ? '#22c55e' : avKey === '1-3-months' ? '#f59e0b' : '#ef4444'
+  const labels: Record<string, string> = {
+    'within-2-weeks': 'Within 2 weeks',
+    '2-4-weeks': '2 to 4 weeks',
+    '1-3-months': '1 to 3 months',
+    '3-plus-months': '3 or more months',
+  }
+
+  function idToSeed(id: string): number {
+    let hash = 0
+    for (let i = 0; i < id.length; i++) {
+      hash = (hash << 5) - hash + id.charCodeAt(i)
+      hash |= 0
+    }
+    return Math.abs(hash) % 70 + 1
+  }
+
+  const seed = idToSeed(assessor.id)
+  const gender = seed % 2 === 0 ? 'women' : 'men'
+  const photoUrl = `https://randomuser.me/api/portraits/${gender}/${seed}.jpg`
+
+  return (
+    <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ background: bg, borderRadius: '8px', padding: '10px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: dot, flexShrink: 0 }} />
+          <p style={{ fontSize: '13px', fontWeight: 700, color: text, margin: 0 }}>{labels[avKey]}</p>
+        </div>
+        <p style={{ fontSize: '11px', color: text, margin: '0 0 0 15px', opacity: 0.75 }}>
+          Updated {formatUpdatedAt(av?.last_updated)}
+        </p>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <img src={photoUrl} alt={assessor.name} style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '0.5px solid #d1dce8' }} />
+        <div>
+          <p style={{ fontSize: '14px', fontWeight: 500, color: '#111827', margin: 0 }}>{assessor.name}</p>
+          <p style={{ fontSize: '12px', color: '#6b7280', margin: '2px 0 0' }}>{assessor.professional_title}</p>
+        </div>
+      </div>
+      <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>{assessor.location_city}</p>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+        {assessor.conditions.map((c) => (
+          <span key={c} style={{ background: '#e8f0fa', color: '#1a3a5c', fontSize: '11px', padding: '2px 8px', borderRadius: '20px' }}>{c}</span>
+        ))}
+      </div>
+      <a href={`/assessor/${assessor.id}`} style={{ display: 'block', textAlign: 'center', background: '#f0f4f8', color: '#1a3a5c', fontSize: '13px', fontWeight: 500, padding: '8px', borderRadius: '8px', textDecoration: 'none', border: '0.5px solid #d1dce8' }}>
+        View profile
+      </a>
+    </div>
+  )
 }
