@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
@@ -11,6 +11,9 @@ export function OnboardingForm() {
   const [step, setStep] = useState(1)
   const [status, setStatus] = useState<Status>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -23,7 +26,6 @@ export function OnboardingForm() {
     availability_range: '',
     bio: '',
     price_range: '',
-    photo_note: '',
   })
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
@@ -42,6 +44,13 @@ export function OnboardingForm() {
     })
   }
 
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setPhotoFile(file)
+    setPhotoPreview(URL.createObjectURL(file))
+  }
+
   function next() { setStep((s) => Math.min(s + 1, TOTAL_STEPS)) }
   function back() { setStep((s) => Math.max(s - 1, 1)) }
 
@@ -50,6 +59,28 @@ export function OnboardingForm() {
     setErrorMessage('')
 
     try {
+      let photoUrl: string | null = null
+
+      if (photoFile) {
+        const fileExt = photoFile.name.split('.').pop()
+        const fileName = `${Date.now()}.${fileExt}`
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(fileName, photoFile)
+
+        if (uploadError) {
+          setErrorMessage(uploadError.message)
+          setStatus('error')
+          return
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(fileName)
+
+        photoUrl = urlData.publicUrl
+      }
+
       const { data: assessor, error: assessorError } = await supabase
         .from('assessors')
         .insert({
@@ -65,6 +96,7 @@ export function OnboardingForm() {
           assessment_types: form.assessment_types,
           is_verified: false,
           tier: 'free',
+          ...(photoUrl ? { photo_url: photoUrl } : {}),
         })
         .select()
         .single()
@@ -126,25 +158,16 @@ export function OnboardingForm() {
   return (
     <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', overflow: 'hidden' }}>
 
-      {/* Progress bar */}
       <div style={{ background: '#f0f4f8', height: '4px' }}>
         <div style={{ background: '#1a3a5c', height: '4px', width: `${progress}%`, transition: 'width 0.3s ease' }} />
       </div>
 
-      {/* Step header */}
       <div style={{ padding: '1.25rem 1.5rem', borderBottom: '0.5px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <p style={{ fontSize: '13px', fontWeight: 500, color: '#9ca3af', margin: 0 }}>
-          Step {step} of {TOTAL_STEPS}
-        </p>
-        <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', margin: 0 }}>
-          {STEP_TITLES[step - 1]}
-        </p>
-        <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>
-          {Math.round(progress)}% complete
-        </p>
+        <p style={{ fontSize: '13px', fontWeight: 500, color: '#9ca3af', margin: 0 }}>Step {step} of {TOTAL_STEPS}</p>
+        <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', margin: 0 }}>{STEP_TITLES[step - 1]}</p>
+        <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>{Math.round(progress)}% complete</p>
       </div>
 
-      {/* Step content */}
       <div style={{ padding: '1.75rem 1.5rem' }}>
 
         {step === 1 && (
@@ -226,13 +249,48 @@ export function OnboardingForm() {
 
         {step === 5 && (
           <StepWrapper title="Profile details" subtitle="Help potential clients understand your experience and approach.">
-            <Field label="Profile photo" hint="Send us a professional headshot after submitting and we will add it to your profile">
-              <div style={{ background: '#f8fafc', border: '0.5px dashed #d1d5db', borderRadius: '8px', padding: '1.25rem', textAlign: 'center' }}>
-                <p style={{ fontSize: '22px', margin: '0 0 6px' }}>📷</p>
-                <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 4px' }}>Email your photo to <strong>hello@assessmentfinder.co.uk</strong></p>
-                <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>Professional headshot recommended. JPG or PNG.</p>
+
+            {/* Photo upload */}
+            <div>
+              <p style={fieldLabelStyle}>Profile photo</p>
+              <p style={hintStyle}>Profiles with photos build more trust and may perform better.</p>
+              <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                {photoPreview ? (
+                  <img src={photoPreview} alt="Preview" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #d1dce8', flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f0f4f8', border: '2px dashed #d1dce8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', flexShrink: 0 }}>
+                    👤
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{ height: '38px', padding: '0 16px', background: '#fff', border: '0.5px solid #d1d5db', borderRadius: '8px', fontSize: '13px', fontWeight: 500, color: '#374151', cursor: 'pointer', fontFamily: 'inherit' }}
+                  >
+                    {photoPreview ? 'Change photo' : 'Upload photo'}
+                  </button>
+                  {photoPreview && (
+                    <button
+                      type="button"
+                      onClick={() => { setPhotoFile(null); setPhotoPreview(null) }}
+                      style={{ height: '38px', padding: '0 16px', background: 'none', border: 'none', fontSize: '13px', color: '#9ca3af', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}
+                    >
+                      Remove
+                    </button>
+                  )}
+                  <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>JPG or PNG. Max 5MB.</p>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/jpg"
+                  onChange={handlePhotoChange}
+                  style={{ display: 'none' }}
+                />
               </div>
-            </Field>
+            </div>
+
             <Field label="Short bio" hint="Tell potential clients about your experience and approach">
               <textarea
                 name="bio"
@@ -251,18 +309,27 @@ export function OnboardingForm() {
 
         {step === 6 && (
           <StepWrapper title="Review and submit" subtitle="Check your details before submitting. We will review your profile before it goes live.">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '8px' }}>
+              {photoPreview ? (
+                <img src={photoPreview} alt="Your photo" style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #d1dce8', flexShrink: 0 }} />
+              ) : (
+                <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#f0f4f8', border: '2px dashed #d1dce8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', flexShrink: 0 }}>👤</div>
+              )}
+              <div>
+                <p style={{ fontSize: '16px', fontWeight: 500, color: '#111827', margin: '0 0 2px' }}>{form.name || 'Your name'}</p>
+                <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>{form.professional_title || 'Your title'} · {form.location_city || 'Your city'}</p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
               {[
-                { label: 'Name', value: form.name },
                 { label: 'Email', value: form.email },
-                { label: 'Location', value: form.location_city },
-                { label: 'Title', value: form.professional_title },
                 { label: 'Governing body', value: form.governing_body || 'Not provided' },
                 { label: 'Registration', value: form.registration_number || 'Not provided' },
                 { label: 'Conditions', value: form.conditions.join(', ') || 'None selected' },
                 { label: 'Assessment types', value: form.assessment_types.join(', ') || 'None selected' },
                 { label: 'Availability', value: AVAILABILITY_LABELS[form.availability_range] || 'Not selected' },
                 { label: 'Price range', value: form.price_range || 'Not provided' },
+                { label: 'Photo', value: photoFile ? photoFile.name : 'No photo uploaded' },
               ].map((item) => (
                 <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '10px 0', borderBottom: '0.5px solid #f3f4f6', gap: '12px' }}>
                   <span style={{ fontSize: '13px', color: '#9ca3af', flexShrink: 0 }}>{item.label}</span>
@@ -286,22 +353,17 @@ export function OnboardingForm() {
 
       </div>
 
-      {/* Navigation */}
       <div style={{ padding: '1.25rem 1.5rem', borderTop: '0.5px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
         {step > 1 ? (
-          <button onClick={back} style={backBtnStyle}>
-            ← Back
-          </button>
+          <button type="button" onClick={back} style={backBtnStyle}>← Back</button>
         ) : (
           <div />
         )}
-
         {step < TOTAL_STEPS ? (
-          <button onClick={next} style={nextBtnStyle}>
-            Continue →
-          </button>
+          <button type="button" onClick={next} style={nextBtnStyle}>Continue →</button>
         ) : (
           <button
+            type="button"
             onClick={handleSubmit}
             disabled={status === 'submitting'}
             style={{ ...nextBtnStyle, opacity: status === 'submitting' ? 0.7 : 1, cursor: status === 'submitting' ? 'not-allowed' : 'pointer' }}
@@ -315,14 +377,7 @@ export function OnboardingForm() {
   )
 }
 
-const STEP_TITLES = [
-  'Basic details',
-  'Credentials',
-  'Services',
-  'Availability',
-  'Profile',
-  'Review',
-]
+const STEP_TITLES = ['Basic details', 'Credentials', 'Services', 'Availability', 'Profile', 'Review']
 
 const AVAILABILITY_LABELS: Record<string, string> = {
   'within-2-weeks': 'Within 2 weeks',
