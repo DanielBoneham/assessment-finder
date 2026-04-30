@@ -11,7 +11,6 @@ export default function ListYourPracticePage() {
   return (
     <PageLayout>
 
-      {/* Hero */}
       <div style={{ background: '#1a3a5c', padding: '3.5rem 0 4.5rem' }}>
         <Container style={{ textAlign: 'center' }}>
           <div style={{ display: 'inline-block', background: 'rgba(74,222,128,0.15)', border: '0.5px solid rgba(74,222,128,0.4)', borderRadius: '20px', padding: '5px 14px', marginBottom: '1.25rem' }}>
@@ -19,11 +18,11 @@ export default function ListYourPracticePage() {
               ✦ Join early for free premium access
             </span>
           </div>
-          <h1 style={{ color: '#fff', fontSize: '30px', fontWeight: 500, lineHeight: 1.3, maxWidth: '560px', margin: '0 auto 1rem' }}>
-            Get more clients by showing your real availability
+          <h1 style={{ color: '#fff', fontSize: '30px', fontWeight: 500, lineHeight: 1.3, maxWidth: '580px', margin: '0 auto 1rem' }}>
+            Get more assessment enquiries by showing your real availability
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '16px', maxWidth: '480px', margin: '0 auto 1.5rem', lineHeight: 1.7 }}>
-            Join Assessment Finder and help people find you when you are available to take on new assessments. Early members get priority visibility at no cost.
+          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '16px', maxWidth: '500px', margin: '0 auto 1.5rem', lineHeight: 1.7 }}>
+            Join Assessment Finder and connect with people actively searching for ADHD, autism and dyslexia assessments. Early members get priority visibility at no cost.
           </p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.08)', border: '0.5px solid rgba(255,255,255,0.15)', borderRadius: '8px', padding: '10px 16px' }}>
             <span style={{ color: '#4ade80', fontSize: '14px' }}>✓</span>
@@ -34,7 +33,6 @@ export default function ListYourPracticePage() {
         </Container>
       </div>
 
-      {/* Benefits */}
       <Section>
         <Container>
           <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1.25rem', textAlign: 'center' }}>
@@ -71,7 +69,6 @@ export default function ListYourPracticePage() {
             ))}
           </div>
 
-          {/* Profile example */}
           <div style={{ marginBottom: '2.5rem' }}>
             <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1.25rem', textAlign: 'center' }}>
               How your profile appears
@@ -104,7 +101,6 @@ export default function ListYourPracticePage() {
             </div>
           </div>
 
-          {/* How it works */}
           <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem', marginBottom: '2rem' }}>
             <h2 style={{ fontSize: '16px', fontWeight: 500, color: '#111827', margin: '0 0 1.25rem', paddingBottom: '0.75rem', borderBottom: '0.5px solid #e5e7eb' }}>
               How it works
@@ -127,11 +123,9 @@ export default function ListYourPracticePage() {
               ))}
             </div>
           </div>
-
         </Container>
       </Section>
 
-      {/* Form */}
       <Section style={{ paddingTop: 0 }}>
         <Container style={{ maxWidth: '640px' }}>
           <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
