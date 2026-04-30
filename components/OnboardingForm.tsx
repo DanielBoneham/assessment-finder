@@ -93,13 +93,27 @@ export function OnboardingForm() {
 
   if (status === 'success') {
     return (
-      <div style={{ background: '#dcfce7', border: '0.5px solid #86efac', borderRadius: '12px', padding: '2.5rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '32px', marginBottom: '12px' }}>✓</div>
-        <p style={{ fontSize: '20px', fontWeight: 500, color: '#166534', margin: '0 0 8px' }}>
-          Profile submitted successfully
+      <div style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '12px', padding: '2.5rem', textAlign: 'center' }}>
+        <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', fontSize: '22px' }}>
+          ✓
+        </div>
+        <p style={{ fontSize: '20px', fontWeight: 500, color: '#111827', margin: '0 0 1rem' }}>
+          Thanks — your profile has been submitted for review.
         </p>
-        <p style={{ fontSize: '14px', color: '#166534', margin: 0, opacity: 0.85 }}>
-          Thanks for joining Assessment Finder. We will review your profile and be in touch within 2 working days.
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'left', background: '#f8fafc', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.25rem' }}>
+          {[
+            'Our team will review your information before publishing to ensure quality and professional standards.',
+            'Early adopters currently receive premium visibility benefits for free.',
+            'We will be in touch within 2 working days.',
+          ].map((text, i) => (
+            <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+              <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#dcfce7', color: '#166534', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>✓</span>
+              <p style={{ fontSize: '14px', color: '#374151', margin: 0, lineHeight: 1.6 }}>{text}</p>
+            </div>
+          ))}
+        </div>
+        <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>
+          Welcome to Assessment Finder.
         </p>
       </div>
     )
@@ -108,7 +122,6 @@ export function OnboardingForm() {
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-      {/* Basic information */}
       <FormSection title="Basic information">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
           <Field label="Full name" required>
@@ -123,7 +136,6 @@ export function OnboardingForm() {
         </Field>
       </FormSection>
 
-      {/* Professional credentials */}
       <FormSection title="Professional credentials">
         <Field label="Professional title" required hint="e.g. Clinical Psychologist, Consultant Psychiatrist">
           <input name="professional_title" required value={form.professional_title} onChange={handleChange} placeholder="e.g. Clinical Psychologist" style={inputStyle} />
@@ -138,7 +150,6 @@ export function OnboardingForm() {
         </div>
       </FormSection>
 
-      {/* Services */}
       <FormSection title="Services">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           <div>
@@ -168,7 +179,6 @@ export function OnboardingForm() {
         </div>
       </FormSection>
 
-      {/* Availability */}
       <FormSection title="Current availability">
         <Field label="How soon can you take on new clients?" required>
           <select name="availability_range" required value={form.availability_range} onChange={handleChange} style={inputStyle}>
@@ -181,7 +191,6 @@ export function OnboardingForm() {
         </Field>
       </FormSection>
 
-      {/* Profile details */}
       <FormSection title="Profile details">
         <Field label="Short bio" hint="Tell potential clients about your experience and approach">
           <textarea
@@ -255,7 +264,6 @@ function checkboxLabel(selected: boolean): React.CSSProperties {
     border: selected ? '1.5px solid #1a3a5c' : '0.5px solid #d1d5db',
     background: selected ? '#e8f0fa' : '#fff',
     color: selected ? '#1a3a5c' : '#374151',
-    transition: 'all 0.1s',
     userSelect: 'none',
   }
 }
