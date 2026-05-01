@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Container } from '@/components/Layout'
 
 type Mode = 'login' | 'reset'
 
@@ -18,15 +17,16 @@ export default function LoginPage() {
     setStatus('loading')
     setErrorMessage('')
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (error) {
+    if (error || !data.session) {
       setErrorMessage('Incorrect email or password. Please try again.')
       setStatus('error')
       return
     }
 
-    window.location.href = '/dashboard'
+    // Force a full page reload so the server picks up the new session cookie
+    window.location.replace('/dashboard')
   }
 
   async function handleReset(e: React.FormEvent) {
@@ -74,25 +74,11 @@ export default function LoginPage() {
               <form onSubmit={handleLogin} style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>
                   <label style={labelStyle}>Email address</label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="jane@example.com"
-                    style={inputStyle}
-                  />
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jane@example.com" style={inputStyle} />
                 </div>
                 <div>
                   <label style={labelStyle}>Password</label>
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Your password"
-                    style={inputStyle}
-                  />
+                  <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" style={inputStyle} />
                 </div>
 
                 {status === 'error' && (
@@ -101,19 +87,11 @@ export default function LoginPage() {
                   </div>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={status === 'loading'}
-                  style={{ height: '46px', background: '#1a3a5c', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: 600, cursor: status === 'loading' ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: status === 'loading' ? 0.7 : 1 }}
-                >
+                <button type="submit" disabled={status === 'loading'} style={{ height: '46px', background: '#1a3a5c', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: 600, cursor: status === 'loading' ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: status === 'loading' ? 0.7 : 1 }}>
                   {status === 'loading' ? 'Signing in...' : 'Sign in'}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => { setMode('reset'); setErrorMessage(''); setStatus('idle') }}
-                  style={{ background: 'none', border: 'none', fontSize: '13px', color: '#6b7280', cursor: 'pointer', fontFamily: 'inherit', padding: 0, textAlign: 'center' }}
-                >
+                <button type="button" onClick={() => { setMode('reset'); setErrorMessage(''); setStatus('idle') }} style={{ background: 'none', border: 'none', fontSize: '13px', color: '#6b7280', cursor: 'pointer', fontFamily: 'inherit', padding: 0, textAlign: 'center' }}>
                   Forgot your password?
                 </button>
               </form>
@@ -132,12 +110,8 @@ export default function LoginPage() {
           {mode === 'reset' && status !== 'reset-sent' && (
             <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', overflow: 'hidden' }}>
               <div style={{ background: '#1a3a5c', padding: '1.75rem' }}>
-                <h1 style={{ color: '#fff', fontSize: '20px', fontWeight: 500, margin: '0 0 4px' }}>
-                  Reset your password
-                </h1>
-                <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '14px', margin: 0 }}>
-                  Enter your email and we will send you a reset link.
-                </p>
+                <h1 style={{ color: '#fff', fontSize: '20px', fontWeight: 500, margin: '0 0 4px' }}>Reset your password</h1>
+                <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '14px', margin: 0 }}>Enter your email and we will send you a reset link.</p>
               </div>
               <form onSubmit={handleReset} style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>
