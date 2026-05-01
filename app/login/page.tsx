@@ -14,7 +14,6 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
-    // If already logged in, go to dashboard
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) window.location.href = '/dashboard'
     })
@@ -24,32 +23,26 @@ export default function LoginPage() {
     e.preventDefault()
     setStatus('loading')
     setErrorMessage('')
-
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-
     if (error || !data.session) {
       setErrorMessage('Incorrect email or password. Please try again.')
       setStatus('error')
       return
     }
-
     setStatus('success')
   }
 
   async function handleReset(e: React.FormEvent) {
     e.preventDefault()
     setStatus('loading')
-
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/update-password`,
     })
-
     if (error) {
       setErrorMessage('Could not send reset email. Please check the address and try again.')
       setStatus('error')
       return
     }
-
     setStatus('reset-sent')
   }
 
@@ -58,9 +51,7 @@ export default function LoginPage() {
 
       <nav style={{ background: '#1a3a5c', padding: '0 2rem', height: '60px', display: 'flex', alignItems: 'center' }}>
         <a href="/" style={{ textDecoration: 'none' }}>
-          <span style={{ fontSize: '17px', fontWeight: 500, color: '#fff' }}>
-            Assessment<span style={{ color: '#4ade80' }}>Finder</span>
-          </span>
+          <span style={{ fontSize: '17px', fontWeight: 500, color: '#fff' }}>Assessment<span style={{ color: '#4ade80' }}>Finder</span></span>
         </a>
       </nav>
 
@@ -71,29 +62,17 @@ export default function LoginPage() {
             <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '2rem', textAlign: 'center' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', fontSize: '20px' }}>✓</div>
               <p style={{ fontSize: '17px', fontWeight: 500, color: '#111827', margin: '0 0 8px' }}>Signed in successfully</p>
-              <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 1.5rem' }}>
-                Click below to go to your dashboard.
-              </p>
-              
-                href="/dashboard"
-                style={{ display: 'block', height: '46px', lineHeight: '46px', background: '#1a3a5c', color: '#fff', borderRadius: '8px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}
-              >
-                Go to dashboard
-              </a>
+              <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 1.5rem' }}>Click below to go to your dashboard.</p>
+              <a href="/dashboard" style={{ display: 'block', height: '46px', lineHeight: '46px', background: '#1a3a5c', color: '#fff', borderRadius: '8px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}>Go to dashboard</a>
             </div>
           )}
 
           {status !== 'success' && mode === 'login' && (
             <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', overflow: 'hidden' }}>
               <div style={{ background: '#1a3a5c', padding: '1.75rem' }}>
-                <h1 style={{ color: '#fff', fontSize: '20px', fontWeight: 500, margin: '0 0 4px' }}>
-                  Assessor login
-                </h1>
-                <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '14px', margin: 0 }}>
-                  Sign in to manage your profile and availability.
-                </p>
+                <h1 style={{ color: '#fff', fontSize: '20px', fontWeight: 500, margin: '0 0 4px' }}>Assessor login</h1>
+                <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '14px', margin: 0 }}>Sign in to manage your profile and availability.</p>
               </div>
-
               <form onSubmit={handleLogin} style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>
                   <label style={labelStyle}>Email address</label>
@@ -103,28 +82,20 @@ export default function LoginPage() {
                   <label style={labelStyle}>Password</label>
                   <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" style={inputStyle} />
                 </div>
-
                 {status === 'error' && (
-                  <div style={{ background: '#fee2e2', border: '0.5px solid #fca5a5', borderRadius: '8px', padding: '10px 14px', fontSize: '13px', color: '#991b1b' }}>
-                    {errorMessage}
-                  </div>
+                  <div style={{ background: '#fee2e2', border: '0.5px solid #fca5a5', borderRadius: '8px', padding: '10px 14px', fontSize: '13px', color: '#991b1b' }}>{errorMessage}</div>
                 )}
-
                 <button type="submit" disabled={status === 'loading'} style={{ height: '46px', background: '#1a3a5c', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: 600, cursor: status === 'loading' ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: status === 'loading' ? 0.7 : 1 }}>
                   {status === 'loading' ? 'Signing in...' : 'Sign in'}
                 </button>
-
                 <button type="button" onClick={() => { setMode('reset'); setErrorMessage(''); setStatus('idle') }} style={{ background: 'none', border: 'none', fontSize: '13px', color: '#6b7280', cursor: 'pointer', fontFamily: 'inherit', padding: 0, textAlign: 'center' }}>
                   Forgot your password?
                 </button>
               </form>
-
               <div style={{ borderTop: '0.5px solid #e5e7eb', padding: '1.25rem 1.75rem', textAlign: 'center' }}>
                 <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>
                   Not yet listed?{' '}
-                  <a href="/list-your-practice" style={{ color: '#1a3a5c', fontWeight: 500, textDecoration: 'none' }}>
-                    Create your free profile
-                  </a>
+                  <a href="/list-your-practice" style={{ color: '#1a3a5c', fontWeight: 500, textDecoration: 'none' }}>Create your free profile</a>
                 </p>
               </div>
             </div>
@@ -142,9 +113,7 @@ export default function LoginPage() {
                   <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jane@example.com" style={inputStyle} />
                 </div>
                 {status === 'error' && (
-                  <div style={{ background: '#fee2e2', border: '0.5px solid #fca5a5', borderRadius: '8px', padding: '10px 14px', fontSize: '13px', color: '#991b1b' }}>
-                    {errorMessage}
-                  </div>
+                  <div style={{ background: '#fee2e2', border: '0.5px solid #fca5a5', borderRadius: '8px', padding: '10px 14px', fontSize: '13px', color: '#991b1b' }}>{errorMessage}</div>
                 )}
                 <button type="submit" disabled={status === 'loading'} style={{ height: '46px', background: '#1a3a5c', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
                   {status === 'loading' ? 'Sending...' : 'Send reset link'}
@@ -160,12 +129,8 @@ export default function LoginPage() {
             <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '2rem', textAlign: 'center' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', fontSize: '20px' }}>✓</div>
               <p style={{ fontSize: '17px', fontWeight: 500, color: '#111827', margin: '0 0 8px' }}>Check your email</p>
-              <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 1.25rem' }}>
-                We have sent a password reset link to <strong>{email}</strong>.
-              </p>
-              <button onClick={() => { setMode('login'); setStatus('idle') }} style={{ background: 'none', border: 'none', fontSize: '13px', color: '#1a3a5c', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
-                Back to login
-              </button>
+              <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 1.25rem' }}>We have sent a password reset link to <strong>{email}</strong>.</p>
+              <button onClick={() => { setMode('login'); setStatus('idle') }} style={{ background: 'none', border: 'none', fontSize: '13px', color: '#1a3a5c', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Back to login</button>
             </div>
           )}
 
