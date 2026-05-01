@@ -1,16 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 
 type Mode = 'login' | 'reset'
+type Status = 'idle' | 'loading' | 'error' | 'reset-sent' | 'success'
 
 export default function LoginPage() {
   const [mode, setMode] = useState<Mode>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'reset-sent'>('idle')
+  const [status, setStatus] = useState<Status>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    // If already logged in, go to dashboard
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) window.location.href = '/dashboard'
+    })
+  }, [])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -25,9 +33,7 @@ export default function LoginPage() {
       return
     }
 
-    setTimeout(() => {
-      window.location.href = '/dashboard'
-    }, 500)
+    setStatus('success')
   }
 
   async function handleReset(e: React.FormEvent) {
@@ -61,7 +67,23 @@ export default function LoginPage() {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
         <div style={{ width: '100%', maxWidth: '400px' }}>
 
-          {mode === 'login' && (
+          {status === 'success' && (
+            <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '2rem', textAlign: 'center' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', fontSize: '20px' }}>✓</div>
+              <p style={{ fontSize: '17px', fontWeight: 500, color: '#111827', margin: '0 0 8px' }}>Signed in successfully</p>
+              <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 1.5rem' }}>
+                Click below to go to your dashboard.
+              </p>
+              
+                href="/dashboard"
+                style={{ display: 'block', height: '46px', lineHeight: '46px', background: '#1a3a5c', color: '#fff', borderRadius: '8px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}
+              >
+                Go to dashboard
+              </a>
+            </div>
+          )}
+
+          {status !== 'success' && mode === 'login' && (
             <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', overflow: 'hidden' }}>
               <div style={{ background: '#1a3a5c', padding: '1.75rem' }}>
                 <h1 style={{ color: '#fff', fontSize: '20px', fontWeight: 500, margin: '0 0 4px' }}>
@@ -88,12 +110,6 @@ export default function LoginPage() {
                   </div>
                 )}
 
-                {status === 'loading' && (
-                  <div style={{ background: '#e8f0fa', borderRadius: '8px', padding: '10px 14px', fontSize: '13px', color: '#1a3a5c', textAlign: 'center' }}>
-                    Signing you in...
-                  </div>
-                )}
-
                 <button type="submit" disabled={status === 'loading'} style={{ height: '46px', background: '#1a3a5c', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: 600, cursor: status === 'loading' ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: status === 'loading' ? 0.7 : 1 }}>
                   {status === 'loading' ? 'Signing in...' : 'Sign in'}
                 </button>
@@ -114,7 +130,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          {mode === 'reset' && status !== 'reset-sent' && (
+          {status !== 'success' && mode === 'reset' && status !== 'reset-sent' && (
             <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', overflow: 'hidden' }}>
               <div style={{ background: '#1a3a5c', padding: '1.75rem' }}>
                 <h1 style={{ color: '#fff', fontSize: '20px', fontWeight: 500, margin: '0 0 4px' }}>Reset your password</h1>
