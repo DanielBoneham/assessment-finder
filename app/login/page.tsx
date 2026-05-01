@@ -25,8 +25,9 @@ export default function LoginPage() {
       return
     }
 
-    // Force a full page reload so the server picks up the new session cookie
-    window.location.replace('/dashboard')
+    setTimeout(() => {
+      window.location.href = '/dashboard'
+    }, 500)
   }
 
   async function handleReset(e: React.FormEvent) {
@@ -84,6 +85,12 @@ export default function LoginPage() {
                 {status === 'error' && (
                   <div style={{ background: '#fee2e2', border: '0.5px solid #fca5a5', borderRadius: '8px', padding: '10px 14px', fontSize: '13px', color: '#991b1b' }}>
                     {errorMessage}
+                  </div>
+                )}
+
+                {status === 'loading' && (
+                  <div style={{ background: '#e8f0fa', borderRadius: '8px', padding: '10px 14px', fontSize: '13px', color: '#1a3a5c', textAlign: 'center' }}>
+                    Signing you in...
                   </div>
                 )}
 
