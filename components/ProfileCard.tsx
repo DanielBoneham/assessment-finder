@@ -1,7 +1,5 @@
 'use client'
 
-import { Button } from './Button'
-
 type AvailabilityRange =
   | 'within-2-weeks'
   | '2-4-weeks'
@@ -57,20 +55,14 @@ export function ProfileCard({
   return (
     <div style={{ background: '#ffffff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-      {/* Availability — top, most prominent */}
       <div style={{ background: av.bg, borderRadius: '8px', padding: '12px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
           <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: av.dot, flexShrink: 0 }} />
-          <p style={{ fontSize: '15px', fontWeight: 700, color: av.text, margin: 0 }}>
-            {av.label}
-          </p>
+          <p style={{ fontSize: '15px', fontWeight: 700, color: av.text, margin: 0 }}>{av.label}</p>
         </div>
-        <p style={{ fontSize: '12px', color: av.text, margin: '0 0 0 17px', opacity: 0.75 }}>
-          Updated {updatedAt}
-        </p>
+        <p style={{ fontSize: '12px', color: av.text, margin: '0 0 0 17px', opacity: 0.75 }}>Updated {updatedAt}</p>
       </div>
 
-      {/* Photo + Name */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <img src={photoUrl} alt={name} style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '0.5px solid #d1dce8' }} />
         <div>
@@ -79,12 +71,8 @@ export function ProfileCard({
         </div>
       </div>
 
-      {/* Location */}
-      <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>
-        {location}
-      </p>
+      <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>{location}</p>
 
-      {/* Condition tags */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
         {conditions.map((condition) => (
           <span key={condition} style={{ background: '#e8f0fa', color: '#1a3a5c', fontSize: '12px', padding: '3px 10px', borderRadius: '20px' }}>
@@ -93,10 +81,11 @@ export function ProfileCard({
         ))}
       </div>
 
-      {/* CTA */}
-      <Button variant="secondary" size="sm" fullWidth onClick={() => { if (href) window.location.href = href }} style={{ marginTop: 'auto' }}>
-        View profile
-      </Button>
+      {href && (
+        <a href={href} style={{ display: 'block', textAlign: 'center', background: '#f0f4f8', color: '#1a3a5c', fontSize: '13px', fontWeight: 500, padding: '8px', borderRadius: '8px', textDecoration: 'none', border: '0.5px solid #d1dce8', marginTop: 'auto' }}>
+          View profile
+        </a>
+      )}
 
     </div>
   )
