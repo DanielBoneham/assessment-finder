@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { DashboardClient } from '@/components/DashboardClient'
 
 type Mode = 'login' | 'reset'
-type Status = 'idle' | 'loading' | 'error' | 'reset-sent' | 'success'
+type Status = 'idle' | 'loading' | 'error' | 'reset-sent'
 
 export default function LoginPage() {
   const [mode, setMode] = useState<Mode>('login')
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const [assessor, setAssessor] = useState<any>(null)
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -26,11 +28,24 @@ export default function LoginPage() {
       return
     }
 
-    // Store token in sessionStorage as backup
-    sessionStorage.setItem('af-token', data.session.access_token)
-    sessionStorage.setItem('af-user-id', data.session.user.id)
+    const { data: assessorData } = await supabase
+      .from('assessors')
+      .select('*, availability(*)')
+      .eq('auth_user_id', data.session.user.id)
+      .single()
 
-    setStatus('success')
+    if (!assessorData) {
+      setErrorMessage('No assessor profile found for this account.')
+      setStatus('error')
+      return
+    }
+
+    const availability = Array.isArray(assessorData.availability)
+      ? assessorData.availability[0] ?? null
+      : assessorData.availability ?? null
+
+    setAssessor({ ...assessorData, availability })
+    setStatus('idle')
   }
 
   async function handleReset(e: React.FormEvent) {
@@ -40,16 +55,52 @@ export default function LoginPage() {
       redirectTo: `${window.location.origin}/update-password`,
     })
     if (error) {
-      setErrorMessage('Could not send reset email. Please check the address and try again.')
+      setErrorMessage('Could not send reset email. Please try again.')
       setStatus('error')
       return
     }
     setStatus('reset-sent')
   }
 
+  async function handleSignOut() {
+    await supabase.auth.signOut()
+    setAssessor(null)
+    setEmail('')
+    setPassword('')
+  }
+
+  // Show dashboard inline after login
+  if (assessor) {
+    return (
+      <div style={{ background: '#f0f4f8', minHeight: '100vh' }}>
+        <nav style={{ background: '#1a3a5c', padding: '0 2rem', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <a href="/" style={{ textDecoration: 'none' }}>
+            <span style={{ fontSize: '17px', fontWeight: 500, color: '#fff' }}>Assessment<span style={{ color: '#4ade80' }}>Finder</span></span>
+          </a>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <a href={`/assessor/${assessor.id}`} target="_blank" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', border: '0.5px solid rgba(255,255,255,0.3)', padding: '6px 12px', borderRadius: '8px' }}>
+              View profile →
+            </a>
+            <button onClick={handleSignOut} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)', background: 'none', border: '0.5px solid rgba(255,255,255,0.3)', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontFamily: 'inherit' }}>
+              Sign out
+            </button>
+          </div>
+        </nav>
+        <div style={{ background: '#1a3a5c', padding: '1.5rem 2rem' }}>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', margin: '0 0 4px' }}>Assessor dashboard</p>
+          <h1 style={{ color: '#fff', fontSize: '22px', fontWeight: 500, margin: 0 }}>
+            Welcome back, {assessor.name.split(' ')[0]}
+          </h1>
+        </div>
+        <div style={{ maxWidth: '860px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+          <DashboardClient assessor={assessor} />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={{ background: '#f0f4f8', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-
       <nav style={{ background: '#1a3a5c', padding: '0 2rem', height: '60px', display: 'flex', alignItems: 'center' }}>
         <a href="/" style={{ textDecoration: 'none' }}>
           <span style={{ fontSize: '17px', fontWeight: 500, color: '#fff' }}>Assessment<span style={{ color: '#4ade80' }}>Finder</span></span>
@@ -59,16 +110,7 @@ export default function LoginPage() {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
         <div style={{ width: '100%', maxWidth: '400px' }}>
 
-          {status === 'success' && (
-            <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '2rem', textAlign: 'center' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', fontSize: '20px' }}>✓</div>
-              <p style={{ fontSize: '17px', fontWeight: 500, color: '#111827', margin: '0 0 8px' }}>Signed in successfully</p>
-              <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 1.5rem' }}>Click below to go to your dashboard.</p>
-              <a href="/dashboard" style={{ display: 'block', height: '46px', lineHeight: '46px', background: '#1a3a5c', color: '#fff', borderRadius: '8px', fontSize: '15px', fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}>Go to dashboard</a>
-            </div>
-          )}
-
-          {status !== 'success' && mode === 'login' && (
+          {mode === 'login' && (
             <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', overflow: 'hidden' }}>
               <div style={{ background: '#1a3a5c', padding: '1.75rem' }}>
                 <h1 style={{ color: '#fff', fontSize: '20px', fontWeight: 500, margin: '0 0 4px' }}>Assessor login</h1>
@@ -102,7 +144,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          {status !== 'success' && mode === 'reset' && status !== 'reset-sent' && (
+          {mode === 'reset' && status !== 'reset-sent' && (
             <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', overflow: 'hidden' }}>
               <div style={{ background: '#1a3a5c', padding: '1.75rem' }}>
                 <h1 style={{ color: '#fff', fontSize: '20px', fontWeight: 500, margin: '0 0 4px' }}>Reset your password</h1>
