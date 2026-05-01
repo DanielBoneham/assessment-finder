@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 type Mode = 'login' | 'reset'
@@ -13,22 +13,19 @@ export default function LoginPage() {
   const [status, setStatus] = useState<Status>('idle')
   const [errorMessage, setErrorMessage] = useState('')
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) window.location.href = '/dashboard'
-    })
-  }, [])
-
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
     setStatus('loading')
     setErrorMessage('')
+
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
     if (error || !data.session) {
       setErrorMessage('Incorrect email or password. Please try again.')
       setStatus('error')
       return
     }
+
     setStatus('success')
   }
 
