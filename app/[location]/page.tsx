@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { searchAssessors, fastestAvailability, AssessorWithAvailability } from '@/lib/api'
 import { buildLocationMeta } from '@/lib/locationMeta'
@@ -6,7 +6,7 @@ import { PageLayout, Container, Section } from '@/components/Layout'
 import { ProfileCard } from '@/components/ProfileCard'
 
 interface Props {
-  params: Promise<{ slug: string }>
+  params: Promise<{ location: string }>
 }
 
 const AVAILABILITY_ORDER: Record<string, number> = {
@@ -25,20 +25,16 @@ function sortByAvailability(assessors: AssessorWithAvailability[]): AssessorWith
 }
 
 function parseSlug(slug: string): { condition: string; city: string } | null {
-  if (slug.startsWith('assessor')) return null
-  if (slug.startsWith('articles')) return null
-  if (slug.startsWith('dashboard')) return null
-  if (slug.startsWith('login')) return null
-  if (slug.startsWith('locations')) return null
-  if (slug.startsWith('list-your-practice')) return null
+  const BLOCKED = ['assessor', 'articles', 'dashboard', 'login', 'locations', 'list-your-practice', 'update-password']
+  if (BLOCKED.some((b) => slug.startsWith(b))) return null
   const parts = slug.split('-assessment-')
   if (parts.length !== 2) return null
   return { condition: parts[0], city: parts[1] }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
-  const parsed = parseSlug(slug)
+  const { location } = await params
+  const parsed = parseSlug(location)
   if (!parsed) return {}
   const meta = buildLocationMeta(parsed.condition, parsed.city)
   if (!meta) return {}
@@ -49,8 +45,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function LocationPage({ params }: Props) {
-  const { slug } = await params
-  const parsed = parseSlug(slug)
+  const { location } = await params
+
+  // Hard redirect for assessor routes that got caught here
+  if (location.startsWith('assessor')) {
+    redirect(`/assessor/${location.replace('assessor/', '').replace('assessor', '')}`)
+  }
+
+  const parsed = parseSlug(location)
   if (!parsed) notFound()
 
   const meta = buildLocationMeta(parsed.condition, parsed.city)
