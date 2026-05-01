@@ -26,6 +26,10 @@ export default function LoginPage() {
       return
     }
 
+    // Store token in sessionStorage as backup
+    sessionStorage.setItem('af-token', data.session.access_token)
+    sessionStorage.setItem('af-user-id', data.session.user.id)
+
     setStatus('success')
   }
 

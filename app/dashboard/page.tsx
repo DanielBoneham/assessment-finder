@@ -12,9 +12,21 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function load() {
-      const { data: { session } } = await supabase.auth.getSession()
+      // Try getting session multiple ways
+      let userId: string | null = null
 
-      if (!session) {
+      // First try getSession
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        userId = session.user.id
+      }
+
+      // Fallback to sessionStorage
+      if (!userId) {
+        userId = sessionStorage.getItem('af-user-id')
+      }
+
+      if (!userId) {
         window.location.href = '/login'
         return
       }
@@ -22,7 +34,7 @@ export default function DashboardPage() {
       const { data, error } = await supabase
         .from('assessors')
         .select('*, availability(*)')
-        .eq('auth_user_id', session.user.id)
+        .eq('auth_user_id', userId)
         .single()
 
       if (error || !data) {
