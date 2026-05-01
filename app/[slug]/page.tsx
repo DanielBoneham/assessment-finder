@@ -25,6 +25,12 @@ function sortByAvailability(assessors: AssessorWithAvailability[]): AssessorWith
 }
 
 function parseSlug(slug: string): { condition: string; city: string } | null {
+  if (slug.startsWith('assessor')) return null
+  if (slug.startsWith('articles')) return null
+  if (slug.startsWith('dashboard')) return null
+  if (slug.startsWith('login')) return null
+  if (slug.startsWith('locations')) return null
+  if (slug.startsWith('list-your-practice')) return null
   const parts = slug.split('-assessment-')
   if (parts.length !== 2) return null
   return { condition: parts[0], city: parts[1] }
@@ -76,7 +82,6 @@ export default async function LocationPage({ params }: Props) {
             {meta.intro}
           </p>
 
-          {/* Fastest availability callout */}
           {fastest && (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(74,222,128,0.15)', border: '0.5px solid rgba(74,222,128,0.4)', borderRadius: '10px', padding: '10px 18px', marginBottom: '1.25rem' }}>
               <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: '#4ade80', flexShrink: 0 }} />
