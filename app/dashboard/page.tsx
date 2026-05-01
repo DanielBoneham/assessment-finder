@@ -8,24 +8,26 @@ import { DashboardClient } from '@/components/DashboardClient'
 export default function DashboardPage() {
   const [assessor, setAssessor] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
 
-      if (!user) {
+      if (!session) {
         window.location.href = '/login'
         return
       }
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('assessors')
         .select('*, availability(*)')
-        .eq('auth_user_id', user.id)
+        .eq('auth_user_id', session.user.id)
         .single()
 
-      if (!data) {
-        window.location.href = '/login'
+      if (error || !data) {
+        setError('Could not find your assessor profile. Please contact support.')
+        setLoading(false)
         return
       }
 
@@ -44,6 +46,16 @@ export default function DashboardPage() {
     return (
       <div style={{ background: '#f0f4f8', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <p style={{ color: '#6b7280', fontSize: '14px' }}>Loading your dashboard...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{ background: '#f0f4f8', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '2rem', textAlign: 'center', maxWidth: '400px' }}>
+          <p style={{ color: '#991b1b', fontSize: '14px', margin: 0 }}>{error}</p>
+        </div>
       </div>
     )
   }
