@@ -1,41 +1,52 @@
-import { redirect } from 'next/navigation'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 import { PageLayout, Container, Section } from '@/components/Layout'
 import { DashboardClient } from '@/components/DashboardClient'
 
-export default async function DashboardPage() {
-  const cookieStore = await cookies()
+export default function DashboardPage() {
+  const [assessor, setAssessor] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll() },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options)
-          })
-        },
-      },
+  useEffect(() => {
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (!user) {
+        window.location.href = '/login'
+        return
+      }
+
+      const { data } = await supabase
+        .from('assessors')
+        .select('*, availability(*)')
+        .eq('auth_user_id', user.id)
+        .single()
+
+      if (!data) {
+        window.location.href = '/login'
+        return
+      }
+
+      const availability = Array.isArray(data.availability)
+        ? data.availability[0] ?? null
+        : data.availability ?? null
+
+      setAssessor({ ...data, availability })
+      setLoading(false)
     }
-  )
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+    load()
+  }, [])
 
-  const { data: assessor } = await supabase
-    .from('assessors')
-    .select('*, availability(*)')
-    .eq('auth_user_id', user.id)
-    .single()
-
-  if (!assessor) redirect('/login')
-
-  const availability = Array.isArray(assessor.availability)
-    ? assessor.availability[0] ?? null
-    : assessor.availability ?? null
+  if (loading) {
+    return (
+      <div style={{ background: '#f0f4f8', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: '#6b7280', fontSize: '14px' }}>Loading your dashboard...</p>
+      </div>
+    )
+  }
 
   return (
     <PageLayout>
@@ -48,17 +59,15 @@ export default async function DashboardPage() {
                 Welcome back, {assessor.name.split(' ')[0]}
               </h1>
             </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <a href={`/assessor/${assessor.id}`} target="_blank" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', border: '0.5px solid rgba(255,255,255,0.3)', padding: '7px 14px', borderRadius: '8px' }}>
-                View public profile →
-              </a>
-            </div>
+            <a href={`/assessor/${assessor.id}`} target="_blank" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', border: '0.5px solid rgba(255,255,255,0.3)', padding: '7px 14px', borderRadius: '8px' }}>
+              View public profile →
+            </a>
           </div>
         </Container>
       </div>
       <Section>
         <Container>
-          <DashboardClient assessor={{ ...assessor, availability }} />
+          <DashboardClient assessor={assessor} />
         </Container>
       </Section>
     </PageLayout>
