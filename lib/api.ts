@@ -16,6 +16,7 @@ export interface Assessor {
   registration_number: string | null
   bio: string | null
   price_range: string | null
+  photo_url: string | null
   conditions: string[]
   assessment_types: string[]
   tier: 'free' | 'featured'
