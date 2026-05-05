@@ -1,6 +1,7 @@
 'use client'
 
-import { ReactNode, useState } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 
 interface ContainerProps {
   children: ReactNode
@@ -22,6 +23,13 @@ interface PageLayoutProps {
 
 export function PageLayout({ children }: PageLayoutProps) {
   const [locationsOpen, setLocationsOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session)
+    })
+  }, [])
 
   const locations = [
     { label: 'London', href: '/adhd-assessment-london' },
@@ -63,9 +71,21 @@ export function PageLayout({ children }: PageLayoutProps) {
 
           <a href="/articles" style={navLink}>Articles</a>
           <a href="/list-your-practice" style={navLink}>For Assessors</a>
-          <a href="/list-your-practice" style={{ color: '#1a3a5c', background: '#4ade80', fontSize: '13px', fontWeight: 600, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px', whiteSpace: 'nowrap' }}>
-            List your practice
-          </a>
+
+          {isLoggedIn ? (
+            <a href="/login" style={{ color: '#1a3a5c', background: '#4ade80', fontSize: '13px', fontWeight: 600, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px', whiteSpace: 'nowrap' }}>
+              Dashboard
+            </a>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <a href="/login" style={{ color: 'rgba(255,255,255,0.75)', fontSize: '13px', textDecoration: 'none', padding: '8px 14px', borderRadius: '8px', border: '0.5px solid rgba(255,255,255,0.3)', whiteSpace: 'nowrap' }}>
+                Login
+              </a>
+              <a href="/list-your-practice" style={{ color: '#1a3a5c', background: '#4ade80', fontSize: '13px', fontWeight: 600, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px', whiteSpace: 'nowrap' }}>
+                List your practice
+              </a>
+            </div>
+          )}
         </div>
       </nav>
 
