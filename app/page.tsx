@@ -60,8 +60,8 @@ export default async function HomePage() {
           <HeroSearch />
 
           {fastest && (
-            <div style={{ marginTop: '2rem', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(74,222,128,0.12)', border: '0.5px solid rgba(74,222,128,0.35)', borderRadius: '10px', padding: '10px 20px', backdropFilter: 'blur(4px)' }}>
-              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#4ade80', flexShrink: 0, boxShadow: '0 0 8px rgba(74,222,128,0.5)' }} />
+            <div style={{ marginTop: '2rem', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(74,222,128,0.12)', border: '0.5px solid rgba(74,222,128,0.35)', borderRadius: '10px', padding: '10px 20px' }}>
+              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#4ade80', flexShrink: 0 }} />
               <p style={{ color: '#fff', fontSize: '15px', fontWeight: 500, margin: 0 }}>
                 Fastest current UK availability: <span style={{ color: '#4ade80' }}>{fastest}</span>
               </p>
@@ -112,10 +112,7 @@ export default async function HomePage() {
               { step: '2', icon: '📅', title: 'Compare', body: 'See assessors sorted by fastest availability and compare credentials.' },
               { step: '3', icon: '✉️', title: 'Contact', body: 'Send a message directly to the assessor and arrange your appointment.' },
             ].map((item) => (
-              <div key={item.step} style={{ background: '#fff', borderRadius: '14px', border: '0.5px solid #e5e7eb', padding: '1.75rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s, transform 0.2s' }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)' }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)' }}
-              >
+              <div key={item.step} style={{ background: '#fff', borderRadius: '14px', border: '0.5px solid #e5e7eb', padding: '1.75rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
                   <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#e8f0fa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
                     {item.icon}
@@ -134,7 +131,7 @@ export default async function HomePage() {
 
       {/* Featured assessors */}
       {featured.length > 0 && (
-        <Section style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #f0f4f8 100%)', paddingTop: '0', padding: '3rem 0' }}>
+        <Section style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #f0f4f8 100%)', padding: '3rem 0' }}>
           <Container>
             <SectionLabel>Featured assessors</SectionLabel>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
@@ -177,10 +174,7 @@ export default async function HomePage() {
               { label: 'Autism assessment Birmingham', href: '/autism-assessment-birmingham' },
             ].map((link) => (
               <a key={link.href} href={link.href} style={{ textDecoration: 'none' }}>
-                <div style={{ background: '#fff', borderRadius: '10px', border: '0.5px solid #e5e7eb', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', transition: 'box-shadow 0.15s, transform 0.15s' }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)' }}
-                >
+                <div style={{ background: '#fff', borderRadius: '10px', border: '0.5px solid #e5e7eb', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
                   <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', margin: 0 }}>{link.label}</p>
                   <span style={{ color: '#9ca3af', fontSize: '14px', flexShrink: 0 }}>→</span>
                 </div>
@@ -213,7 +207,7 @@ export default async function HomePage() {
                 List your practice for free and get discovered by people searching for assessments near them.
               </p>
             </div>
-            <a href="/list-your-practice" style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '14px', fontWeight: 600, padding: '13px 26px', borderRadius: '10px', textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(74,222,128,0.3)', transition: 'transform 0.15s, box-shadow 0.15s' }}>
+            <a href="/list-your-practice" style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '14px', fontWeight: 600, padding: '13px 26px', borderRadius: '10px', textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(74,222,128,0.3)' }}>
               List your practice
             </a>
           </div>
@@ -283,10 +277,7 @@ function AssessorCard({ assessor }: { assessor: AssessorWithAvailability }) {
   const photoUrl = assessor.photo_url || `https://randomuser.me/api/portraits/${gender}/${seed}.jpg`
 
   return (
-    <div style={{ background: '#fff', borderRadius: '14px', border: '0.5px solid #e5e7eb', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', transition: 'box-shadow 0.2s, transform 0.2s' }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)' }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)' }}
-    >
+    <div style={{ background: '#fff', borderRadius: '14px', border: '0.5px solid #e5e7eb', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
       <div style={{ background: bg, borderRadius: '8px', padding: '10px 12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: dot, flexShrink: 0 }} />
@@ -309,7 +300,7 @@ function AssessorCard({ assessor }: { assessor: AssessorWithAvailability }) {
           <span key={c} style={{ background: '#e8f0fa', color: '#1a3a5c', fontSize: '11px', padding: '3px 10px', borderRadius: '20px', fontWeight: 500 }}>{c}</span>
         ))}
       </div>
-      <a href={`/assessor/${assessor.id}`} style={{ display: 'block', textAlign: 'center', background: '#f0f4f8', color: '#1a3a5c', fontSize: '13px', fontWeight: 500, padding: '9px', borderRadius: '8px', textDecoration: 'none', border: '0.5px solid #e5e7eb', marginTop: 'auto', transition: 'background 0.15s' }}>
+      <a href={`/assessor/${assessor.id}`} style={{ display: 'block', textAlign: 'center', background: '#f0f4f8', color: '#1a3a5c', fontSize: '13px', fontWeight: 500, padding: '9px', borderRadius: '8px', textDecoration: 'none', border: '0.5px solid #e5e7eb', marginTop: 'auto' }}>
         View profile
       </a>
     </div>

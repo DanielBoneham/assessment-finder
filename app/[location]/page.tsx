@@ -16,6 +16,13 @@ const AVAILABILITY_ORDER: Record<string, number> = {
   '3-plus-months':  3,
 }
 
+const AVAILABILITY_LABELS: Record<string, string> = {
+  'within-2-weeks': 'Within 2 weeks',
+  '2-4-weeks':      '2 to 4 weeks',
+  '1-3-months':     '1 to 3 months',
+  '3-plus-months':  '3 or more months',
+}
+
 function sortByAvailability(assessors: AssessorWithAvailability[]): AssessorWithAvailability[] {
   return [...assessors].sort((a, b) => {
     const aO = AVAILABILITY_ORDER[a.availability?.availability_range ?? '3-plus-months'] ?? 3
@@ -44,10 +51,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
+function formatUpdatedAt(timestamp?: string | null): string {
+  if (!timestamp) return 'recently'
+  const diff = Date.now() - new Date(timestamp).getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  if (days === 0) return 'today'
+  if (days === 1) return '1 day ago'
+  return `${days} days ago`
+}
+
 export default async function LocationPage({ params }: Props) {
   const { location } = await params
 
-  // Hard redirect for assessor routes that got caught here
   if (location.startsWith('assessor')) {
     redirect(`/assessor/${location.replace('assessor/', '').replace('assessor', '')}`)
   }
@@ -68,11 +83,47 @@ export default async function LocationPage({ params }: Props) {
   const sorted = sortByAvailability(assessors)
   const fastest = assessors.length > 0 ? fastestAvailability(assessors) : null
   const count = assessors.length
+  const topAssessors = sorted.slice(0, 5)
+  const pageUpdated = sorted[0]?.availability?.last_updated ?? null
+
+  const relatedQuestions = [
+    { q: `How long does a ${meta.conditionLabel} assessment take?`, href: '/articles/what-happens-during-an-autism-assessment' },
+    { q: `Can I get a ${meta.conditionLabel} assessment privately in ${meta.city}?`, href: `/${parsed.condition.toLowerCase()}-assessment-${parsed.city.toLowerCase()}` },
+    { q: 'What is the difference between NHS and private assessments?', href: '/articles/nhs-vs-private-assessment-uk' },
+    { q: 'How much does a private assessment cost?', href: '/articles/adhd-assessment-waiting-times-uk' },
+    { q: `What is the fastest way to get a ${meta.conditionLabel} assessment?`, href: '/' },
+  ]
+
+  const localBusinessSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'MedicalBusiness',
+    name: `${meta.conditionLabel} Assessment ${meta.city}`,
+    description: meta.metaDescription,
+    areaServed: meta.city,
+    serviceType: `${meta.conditionLabel} Assessment`,
+    url: `https://www.assessmentfinder.co.uk/${parsed.condition.toLowerCase()}-assessment-${parsed.city.toLowerCase()}`,
+  }
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: relatedQuestions.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: `Find out more about ${meta.conditionLabel} assessments in ${meta.city} on Assessment Finder.`,
+      },
+    })),
+  }
 
   return (
     <PageLayout>
 
-      <div style={{ background: '#1a3a5c', padding: '2.5rem 0 3rem' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+
+      <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #1e4a72 100%)', padding: '2.5rem 0 3rem' }}>
         <Container>
           <a href="/" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', display: 'inline-block', marginBottom: '1.25rem' }}>
             Back to all assessors
@@ -98,20 +149,33 @@ export default async function LocationPage({ params }: Props) {
             {fastest && <SummaryPill label="Fastest availability" value={fastest} highlight />}
             <SummaryPill label="Location" value={meta.city} />
             <SummaryPill label="Condition" value={meta.conditionLabel} />
+            {pageUpdated && <SummaryPill label="Last updated" value={formatUpdatedAt(pageUpdated)} />}
+          </div>
+        </Container>
+      </div>
+
+      <div style={{ background: '#f0fdf4', borderBottom: '0.5px solid #86efac' }}>
+        <Container>
+          <div style={{ padding: '1.5rem 0' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#166534', margin: '0 0 8px' }}>
+              How quickly can I get {meta.conditionLabel === 'ADHD' ? 'an' : 'a'} {meta.conditionLabel} assessment in {meta.city}?
+            </h2>
+            <p style={{ fontSize: '14px', color: '#166534', margin: 0, lineHeight: 1.7, opacity: 0.9 }}>
+              {fastest
+                ? `Some private assessors in ${meta.city} currently have availability ${fastest.toLowerCase()}. Waiting times vary between providers. Assessment Finder shows real availability so you can find the shortest waiting time.`
+                : `Private assessors in ${meta.city} typically offer shorter waiting times than the NHS. Assessment Finder lists current availability so you can compare options and find the shortest wait.`}
+            </p>
           </div>
         </Container>
       </div>
 
       <Section>
         <Container>
-          <SectionHeading>
-            Available {meta.conditionLabel} assessors in {meta.city}
-          </SectionHeading>
+          <SectionHeading>Available {meta.conditionLabel} assessors in {meta.city}</SectionHeading>
           <p style={{ fontSize: '15px', color: '#374151', marginBottom: '1.5rem' }}>
             {count === 0
               ? `No assessors are listed in ${meta.city} for ${meta.conditionLabel} yet.`
-              : `There ${count === 1 ? 'is' : 'are'} ${count} ${meta.conditionLabel} assessor${count === 1 ? '' : 's'} in ${meta.city}. Sorted by fastest availability first.`
-            }
+              : `There ${count === 1 ? 'is' : 'are'} ${count} ${meta.conditionLabel} assessor${count === 1 ? '' : 's'} in ${meta.city}. Sorted by fastest availability first.`}
           </p>
           {count === 0 ? (
             <div style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '12px', padding: '2rem', textAlign: 'center' }}>
@@ -142,16 +206,48 @@ export default async function LocationPage({ params }: Props) {
         </Container>
       </Section>
 
+      {topAssessors.length > 0 && (
+        <Section style={{ paddingTop: 0 }}>
+          <Container>
+            <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
+              <SectionHeading>Fastest available {meta.conditionLabel} assessors in {meta.city}</SectionHeading>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                {topAssessors.map((assessor, i) => {
+                  const avKey = assessor.availability?.availability_range ?? '3-plus-months'
+                  const isGreen = avKey === 'within-2-weeks' || avKey === '2-4-weeks'
+                  const dotColor = isGreen ? '#22c55e' : avKey === '1-3-months' ? '#f59e0b' : '#ef4444'
+                  return (
+                    <div key={assessor.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: i < topAssessors.length - 1 ? '0.5px solid #f3f4f6' : 'none', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
+                        <div>
+                          <p style={{ fontSize: '14px', fontWeight: 500, color: '#111827', margin: 0 }}>{assessor.name}</p>
+                          <p style={{ fontSize: '12px', color: '#6b7280', margin: '2px 0 0' }}>{assessor.professional_title}</p>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <p style={{ fontSize: '13px', fontWeight: 500, color: isGreen ? '#166534' : '#92400e', margin: 0, whiteSpace: 'nowrap' }}>
+                          {AVAILABILITY_LABELS[avKey]}
+                        </p>
+                        <a href={`/assessor/${assessor.id}`} style={{ fontSize: '12px', color: '#1a3a5c', textDecoration: 'none', fontWeight: 500, background: '#e8f0fa', padding: '4px 10px', borderRadius: '6px', whiteSpace: 'nowrap' }}>
+                          View →
+                        </a>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </Container>
+        </Section>
+      )}
+
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
-            <SectionHeading>
-              What to expect from {meta.conditionLabel === 'ADHD' ? 'an' : 'a'} {meta.conditionLabel} assessment
-            </SectionHeading>
+            <SectionHeading>What to expect from {meta.conditionLabel === 'ADHD' ? 'an' : 'a'} {meta.conditionLabel} assessment</SectionHeading>
             {meta.seoBody.split('\n\n').map((para, i) => (
-              <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
-                {para}
-              </p>
+              <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>{para}</p>
             ))}
           </div>
         </Container>
@@ -161,11 +257,9 @@ export default async function LocationPage({ params }: Props) {
         <Section style={{ paddingTop: 0 }}>
           <Container>
             <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
-              <SectionHeading>How to find an ADHD assessment near you</SectionHeading>
+              <SectionHeading>How to find {meta.conditionLabel === 'ADHD' ? 'an' : 'a'} {meta.conditionLabel} assessment near you</SectionHeading>
               {meta.seoExtra.split('\n\n').map((para, i) => (
-                <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
-                  {para}
-                </p>
+                <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>{para}</p>
               ))}
             </div>
           </Container>
@@ -184,10 +278,24 @@ export default async function LocationPage({ params }: Props) {
               'For many people, the decision comes down to urgency, budget, and availability.',
               'Assessment Finder allows you to compare private assessors and see who is currently available, helping you make a more informed decision.',
             ].map((para, i, arr) => (
-              <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: i < arr.length - 1 ? '0.75rem' : 0 }}>
-                {para}
-              </p>
+              <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: i < arr.length - 1 ? '0.75rem' : 0 }}>{para}</p>
             ))}
+          </div>
+        </Container>
+      </Section>
+
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
+            <SectionHeading>Related questions</SectionHeading>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+              {relatedQuestions.map((item, i) => (
+                <a key={i} href={item.href} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: i < relatedQuestions.length - 1 ? '0.5px solid #f3f4f6' : 'none', textDecoration: 'none', gap: '12px' }}>
+                  <p style={{ fontSize: '14px', color: '#1a3a5c', margin: 0, fontWeight: 500 }}>{item.q}</p>
+                  <span style={{ color: '#9ca3af', flexShrink: 0 }}>→</span>
+                </a>
+              ))}
+            </div>
           </div>
         </Container>
       </Section>
@@ -240,15 +348,6 @@ function SummaryPill({ label, value, highlight = false }: { label: string; value
       <p style={{ fontSize: '15px', fontWeight: 500, color: highlight ? '#4ade80' : '#fff', margin: 0 }}>{value}</p>
     </div>
   )
-}
-
-function formatUpdatedAt(timestamp?: string | null): string {
-  if (!timestamp) return 'recently'
-  const diff = Date.now() - new Date(timestamp).getTime()
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  if (days === 0) return 'today'
-  if (days === 1) return '1 day ago'
-  return `${days} days ago`
 }
 
 const OTHER_CONDITIONS: Record<string, string[]> = {
