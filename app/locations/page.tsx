@@ -32,6 +32,12 @@ const LINKS = [
 
 const CITIES = ['London', 'Manchester', 'Birmingham', 'Bristol', 'Leeds', 'Edinburgh', 'Glasgow']
 
+const UK_PAGES = [
+  { label: 'ADHD assessment UK — national overview', href: '/adhd-assessment-uk' },
+  { label: 'Autism assessment UK — national overview', href: '/autism-assessment-uk' },
+  { label: 'Dyslexia assessment UK — national overview', href: '/dyslexia-assessment-uk' },
+]
+
 function LocationLink({ label, href }: { label: string; href: string }) {
   return (
     <a href={href} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '14px', color: '#1a3a5c', textDecoration: 'none', padding: '8px 12px', borderRadius: '8px', background: '#f0f4f8', fontWeight: 500 }}>
@@ -58,6 +64,23 @@ export default function LocationsPage() {
 
       <Section>
         <Container>
+
+          {/* UK overview pages */}
+          <div style={{ marginBottom: '2rem' }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '1rem' }}>
+              National overviews
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {UK_PAGES.map((page) => (
+                <LocationLink key={page.href} label={page.label} href={page.href} />
+              ))}
+            </div>
+          </div>
+
+          {/* City pages */}
+          <p style={{ fontSize: '11px', fontWeight: 600, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '1rem' }}>
+            Browse by city
+          </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
             {CITIES.map((city) => (
               <div key={city} style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
@@ -70,6 +93,7 @@ export default function LocationsPage() {
               </div>
             ))}
           </div>
+
         </Container>
       </Section>
 

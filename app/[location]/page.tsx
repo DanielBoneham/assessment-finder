@@ -32,7 +32,7 @@ function sortByAvailability(assessors: AssessorWithAvailability[]): AssessorWith
 }
 
 function parseSlug(slug: string): { condition: string; city: string } | null {
-  const BLOCKED = ['assessor', 'articles', 'dashboard', 'login', 'locations', 'list-your-practice', 'update-password']
+  const BLOCKED = ['assessor', 'articles', 'dashboard', 'login', 'locations', 'list-your-practice', 'update-password', 'adhd-assessment-uk', 'autism-assessment-uk', 'dyslexia-assessment-uk']
   if (BLOCKED.some((b) => slug.startsWith(b))) return null
   const parts = slug.split('-assessment-')
   if (parts.length !== 2) return null
@@ -60,6 +60,21 @@ function formatUpdatedAt(timestamp?: string | null): string {
   return `${days} days ago`
 }
 
+function getAverageAvailability(assessors: AssessorWithAvailability[]): string {
+  if (assessors.length === 0) return 'unknown'
+  const order = ['within-2-weeks', '2-4-weeks', '1-3-months', '3-plus-months']
+  const counts: Record<string, number> = {}
+  assessors.forEach((a) => {
+    const key = a.availability?.availability_range ?? '3-plus-months'
+    counts[key] = (counts[key] || 0) + 1
+  })
+  const dominant = order.find((o) => counts[o] && counts[o] >= assessors.length / 2)
+  if (dominant === 'within-2-weeks') return '2 to 4 weeks'
+  if (dominant === '2-4-weeks') return '2 to 6 weeks'
+  if (dominant === '1-3-months') return '4 to 12 weeks'
+  return '8 to 16 weeks'
+}
+
 export default async function LocationPage({ params }: Props) {
   const { location } = await params
 
@@ -82,13 +97,16 @@ export default async function LocationPage({ params }: Props) {
 
   const sorted = sortByAvailability(assessors)
   const fastest = assessors.length > 0 ? fastestAvailability(assessors) : null
+  const average = getAverageAvailability(assessors)
   const count = assessors.length
   const topAssessors = sorted.slice(0, 5)
   const pageUpdated = sorted[0]?.availability?.last_updated ?? null
+  const condLower = parsed.condition.toLowerCase()
+  const ukPage = `/${condLower}-assessment-uk`
 
   const relatedQuestions = [
     { q: `How long does a ${meta.conditionLabel} assessment take?`, href: '/articles/what-happens-during-an-autism-assessment' },
-    { q: `Can I get a ${meta.conditionLabel} assessment privately in ${meta.city}?`, href: `/${parsed.condition.toLowerCase()}-assessment-${parsed.city.toLowerCase()}` },
+    { q: `Can I get a ${meta.conditionLabel} assessment privately in ${meta.city}?`, href: `/${condLower}-assessment-${parsed.city.toLowerCase()}` },
     { q: 'What is the difference between NHS and private assessments?', href: '/articles/nhs-vs-private-assessment-uk' },
     { q: 'How much does a private assessment cost?', href: '/articles/adhd-assessment-waiting-times-uk' },
     { q: `What is the fastest way to get a ${meta.conditionLabel} assessment?`, href: '/' },
@@ -101,7 +119,7 @@ export default async function LocationPage({ params }: Props) {
     description: meta.metaDescription,
     areaServed: meta.city,
     serviceType: `${meta.conditionLabel} Assessment`,
-    url: `https://www.assessmentfinder.co.uk/${parsed.condition.toLowerCase()}-assessment-${parsed.city.toLowerCase()}`,
+    url: `https://www.assessmentfinder.co.uk/${condLower}-assessment-${parsed.city.toLowerCase()}`,
   }
 
   const faqSchema = {
@@ -134,7 +152,6 @@ export default async function LocationPage({ params }: Props) {
           <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '15px', maxWidth: '560px', margin: '0 0 1.5rem' }}>
             {meta.intro}
           </p>
-
           {fastest && (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(74,222,128,0.15)', border: '0.5px solid rgba(74,222,128,0.4)', borderRadius: '10px', padding: '10px 18px', marginBottom: '1.25rem' }}>
               <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: '#4ade80', flexShrink: 0 }} />
@@ -143,7 +160,6 @@ export default async function LocationPage({ params }: Props) {
               </p>
             </div>
           )}
-
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
             <SummaryPill label="Assessors listed" value={count > 0 ? String(count) : 'None yet'} />
             {fastest && <SummaryPill label="Fastest availability" value={fastest} highlight />}
@@ -154,6 +170,7 @@ export default async function LocationPage({ params }: Props) {
         </Container>
       </div>
 
+      {/* Answer block */}
       <div style={{ background: '#f0fdf4', borderBottom: '0.5px solid #86efac' }}>
         <Container>
           <div style={{ padding: '1.5rem 0' }}>
@@ -162,8 +179,8 @@ export default async function LocationPage({ params }: Props) {
             </h2>
             <p style={{ fontSize: '14px', color: '#166534', margin: 0, lineHeight: 1.7, opacity: 0.9 }}>
               {fastest
-                ? `Some private assessors in ${meta.city} currently have availability ${fastest.toLowerCase()}. Waiting times vary between providers. Assessment Finder shows real availability so you can find the shortest waiting time.`
-                : `Private assessors in ${meta.city} typically offer shorter waiting times than the NHS. Assessment Finder lists current availability so you can compare options and find the shortest wait.`}
+                ? `As of 2026, some private assessors in ${meta.city} currently have availability ${fastest.toLowerCase()}. Across listed providers, average waiting times are currently around ${average}. Waiting times vary between providers and change regularly. Assessment Finder shows real-time availability so you can find the shortest current wait.`
+                : `Private assessors in ${meta.city} typically offer shorter waiting times than the NHS. As of 2026, NHS waiting times in many areas exceed 12 months, while private providers often have appointments available within weeks. Assessment Finder lists current availability so you can compare options.`}
             </p>
           </div>
         </Container>
@@ -174,8 +191,8 @@ export default async function LocationPage({ params }: Props) {
           <SectionHeading>Available {meta.conditionLabel} assessors in {meta.city}</SectionHeading>
           <p style={{ fontSize: '15px', color: '#374151', marginBottom: '1.5rem' }}>
             {count === 0
-              ? `No assessors are listed in ${meta.city} for ${meta.conditionLabel} yet.`
-              : `There ${count === 1 ? 'is' : 'are'} ${count} ${meta.conditionLabel} assessor${count === 1 ? '' : 's'} in ${meta.city}. Sorted by fastest availability first.`}
+              ? `No assessors are currently listed in ${meta.city} for ${meta.conditionLabel}.`
+              : `There ${count === 1 ? 'is' : 'are'} ${count} ${meta.conditionLabel} assessor${count === 1 ? '' : 's'} listed in ${meta.city}. Sorted by fastest availability first. All providers are registered with a recognised UK governing body such as the HCPC, BPS or GMC.`}
           </p>
           {count === 0 ? (
             <div style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '12px', padding: '2rem', textAlign: 'center' }}>
@@ -206,6 +223,34 @@ export default async function LocationPage({ params }: Props) {
         </Container>
       </Section>
 
+      {/* Aggregated insights */}
+      {count > 0 && (
+        <Section style={{ paddingTop: 0 }}>
+          <Container>
+            <div style={{ background: '#f0f8ff', borderRadius: '12px', border: '0.5px solid #bfdbfe', padding: '1.75rem' }}>
+              <SectionHeading>Availability insights for {meta.conditionLabel} assessments in {meta.city}</SectionHeading>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '1.25rem' }}>
+                {[
+                  { label: 'Assessors listed', value: String(count) },
+                  { label: 'Fastest current availability', value: fastest ?? 'Not available' },
+                  { label: 'Average availability', value: average },
+                  { label: 'Data last updated', value: formatUpdatedAt(pageUpdated) },
+                ].map((item) => (
+                  <div key={item.label} style={{ background: '#fff', borderRadius: '8px', padding: '12px 14px', border: '0.5px solid #bfdbfe' }}>
+                    <p style={{ fontSize: '11px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 4px', fontWeight: 500 }}>{item.label}</p>
+                    <p style={{ fontSize: '15px', fontWeight: 600, color: '#1e3a5f', margin: 0 }}>{item.value}</p>
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: '13px', color: '#374151', margin: 0, lineHeight: 1.7 }}>
+                As of 2026, the average waiting time for a private {meta.conditionLabel} assessment in {meta.city} is currently around {average}, based on providers listed on Assessment Finder. The fastest available appointments are currently {fastest ? fastest.toLowerCase() : 'subject to provider availability'}. Waiting times are updated regularly by assessors and may change. NHS {meta.conditionLabel} assessment waiting times in many UK areas currently exceed 12 to 18 months.
+              </p>
+            </div>
+          </Container>
+        </Section>
+      )}
+
+      {/* Fastest assessors */}
       {topAssessors.length > 0 && (
         <Section style={{ paddingTop: 0 }}>
           <Container>
@@ -242,48 +287,62 @@ export default async function LocationPage({ params }: Props) {
         </Section>
       )}
 
+      {/* SEO content */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
-            <SectionHeading>What to expect from {meta.conditionLabel === 'ADHD' ? 'an' : 'a'} {meta.conditionLabel} assessment</SectionHeading>
+            <SectionHeading>What to expect from {meta.conditionLabel === 'ADHD' ? 'an' : 'a'} {meta.conditionLabel} assessment in {meta.city}</SectionHeading>
             {meta.seoBody.split('\n\n').map((para, i) => (
               <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>{para}</p>
             ))}
+            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, margin: '0.75rem 0 0' }}>
+              Private {meta.conditionLabel} assessments in {meta.city} may be provided by clinical psychologists, consultant psychiatrists, or specialist nurses. Providers are typically regulated by bodies such as the HCPC, BPS, or GMC. Assessment Finder only lists providers registered with a recognised UK professional body.
+            </p>
           </div>
         </Container>
       </Section>
 
-      {meta.seoExtra && (
-        <Section style={{ paddingTop: 0 }}>
-          <Container>
-            <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
-              <SectionHeading>How to find {meta.conditionLabel === 'ADHD' ? 'an' : 'a'} {meta.conditionLabel} assessment near you</SectionHeading>
-              {meta.seoExtra.split('\n\n').map((para, i) => (
-                <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>{para}</p>
-              ))}
-            </div>
-          </Container>
-        </Section>
-      )}
-
+      {/* NHS vs Private */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
-            <SectionHeading>Private vs NHS assessments</SectionHeading>
-            {[
-              'There are two main routes to getting an ADHD, autism, or dyslexia assessment in the UK: through the NHS or through a private provider.',
-              'NHS assessments are typically free at the point of access, but waiting times are often long due to high demand. In many areas, people may wait several months or longer for an appointment.',
-              'Private assessments involve paying for the service, but they usually offer significantly shorter waiting times. Many providers can offer appointments within weeks rather than months.',
-              'Private assessments may also provide more flexibility in scheduling and choice of clinician, including remote options.',
-              'For many people, the decision comes down to urgency, budget, and availability.',
-              'Assessment Finder allows you to compare private assessors and see who is currently available, helping you make a more informed decision.',
-            ].map((para, i, arr) => (
-              <p key={i} style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: i < arr.length - 1 ? '0.75rem' : 0 }}>{para}</p>
-            ))}
+            <SectionHeading>NHS vs private {meta.conditionLabel} assessments</SectionHeading>
+            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+              In the UK, {meta.conditionLabel} assessments are available through the NHS or through private providers. As of 2026, NHS waiting times in many areas exceed 12 to 18 months due to high demand and limited specialist capacity.
+            </p>
+            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+              Private {meta.conditionLabel} assessments in {meta.city} are typically available significantly sooner. Many providers currently offer appointments within 2 to 12 weeks, depending on availability and demand at the time of enquiry.
+            </p>
+            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+              Private assessments involve a fee, which varies between providers. Prices for a private {meta.conditionLabel} assessment in the UK typically range from £500 to £1,500 depending on the assessor's qualifications and the scope of the assessment.
+            </p>
+            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, margin: 0 }}>
+              Assessment Finder allows you to compare private assessors in {meta.city} and view real availability, helping you make a more informed decision about your options.
+            </p>
           </div>
         </Container>
       </Section>
 
+      {/* UK page link */}
+      <Section style={{ paddingTop: 0 }}>
+        <Container>
+          <div style={{ background: '#f8fafc', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+            <div>
+              <p style={{ fontSize: '14px', fontWeight: 500, color: '#111827', margin: '0 0 3px' }}>
+                {meta.conditionLabel} assessments across the UK
+              </p>
+              <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>
+                View national waiting times, cost guidance, and assessor availability across the UK.
+              </p>
+            </div>
+            <a href={ukPage} style={{ fontSize: '13px', color: '#1a3a5c', fontWeight: 600, textDecoration: 'none', background: '#e8f0fa', padding: '8px 16px', borderRadius: '8px', whiteSpace: 'nowrap' }}>
+              View UK overview →
+            </a>
+          </div>
+        </Container>
+      </Section>
+
+      {/* Related questions */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.75rem' }}>
@@ -300,6 +359,7 @@ export default async function LocationPage({ params }: Props) {
         </Container>
       </Section>
 
+      {/* For assessors CTA */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <div style={{ background: '#1a3a5c', borderRadius: '12px', padding: '1.75rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
@@ -314,6 +374,7 @@ export default async function LocationPage({ params }: Props) {
         </Container>
       </Section>
 
+      {/* Related searches */}
       <Section style={{ paddingTop: 0 }}>
         <Container>
           <p style={{ fontSize: '13px', fontWeight: 500, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '1rem' }}>
