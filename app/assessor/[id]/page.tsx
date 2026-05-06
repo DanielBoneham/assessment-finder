@@ -36,6 +36,21 @@ function getPhotoUrl(id: string): string {
   return `https://randomuser.me/api/portraits/${gender}/${seed}.jpg`
 }
 
+function formatUpdatedAt(timestamp?: string | null): string {
+  if (!timestamp) return 'recently'
+  const diff = Date.now() - new Date(timestamp).getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  if (days === 0) return 'today'
+  if (days === 1) return '1 day ago'
+  return `${days} days ago`
+}
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  })
+}
+
 export default async function AssessorProfilePage({ params }: Props) {
   const { id } = await params
   const assessor = await getAssessorById(id)
@@ -50,11 +65,24 @@ export default async function AssessorProfilePage({ params }: Props) {
   const photoUrl = assessor.photo_url || getPhotoUrl(id)
   const firstName = assessor.name.split(' ')[0]
 
+  const personSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: assessor.name,
+    jobTitle: assessor.professional_title,
+    address: { '@type': 'PostalAddress', addressLocality: assessor.location_city, addressCountry: 'GB' },
+    ...(assessor.governing_body ? { memberOf: { '@type': 'Organization', name: assessor.governing_body } } : {}),
+    ...(assessor.bio ? { description: assessor.bio } : {}),
+    ...(photoUrl ? { image: photoUrl } : {}),
+  }
+
   return (
     <PageLayout>
 
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }} />
+
       {/* Hero */}
-      <div style={{ background: '#1a3a5c', padding: '2.5rem 0 3rem' }}>
+      <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #1e4a72 100%)', padding: '2.5rem 0 3rem' }}>
         <Container>
           <a href="/" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', display: 'inline-block', marginBottom: '1.25rem' }}>
             Back to all assessors
@@ -63,12 +91,8 @@ export default async function AssessorProfilePage({ params }: Props) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
               <img src={photoUrl} alt={assessor.name} style={{ width: '88px', height: '88px', borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.2)', flexShrink: 0 }} />
               <div>
-                <h1 style={{ color: '#fff', fontSize: '26px', fontWeight: 500, margin: '0 0 4px' }}>
-                  {assessor.name}
-                </h1>
-                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', margin: '0 0 12px' }}>
-                  {assessor.professional_title} · {assessor.location_city}
-                </p>
+                <h1 style={{ color: '#fff', fontSize: '26px', fontWeight: 500, margin: '0 0 4px' }}>{assessor.name}</h1>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', margin: '0 0 12px' }}>{assessor.professional_title} · {assessor.location_city}</p>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {assessor.is_verified && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(74,222,128,0.2)', color: '#4ade80', fontSize: '12px', fontWeight: 600, padding: '5px 12px', borderRadius: '20px', border: '0.5px solid rgba(74,222,128,0.4)' }}>
@@ -86,12 +110,9 @@ export default async function AssessorProfilePage({ params }: Props) {
                 </div>
               </div>
             </div>
-
             {av && (
               <div style={{ background: avColor.bg, border: `1px solid ${avColor.border}`, borderRadius: '12px', padding: '1.25rem 1.5rem', minWidth: '240px' }}>
-                <p style={{ fontSize: '11px', fontWeight: 600, color: avColor.text, textTransform: 'uppercase', letterSpacing: '0.7px', margin: '0 0 8px', opacity: 0.7 }}>
-                  Current availability
-                </p>
+                <p style={{ fontSize: '11px', fontWeight: 600, color: avColor.text, textTransform: 'uppercase', letterSpacing: '0.7px', margin: '0 0 8px', opacity: 0.7 }}>Current availability</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                   <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: avColor.dot, flexShrink: 0 }} />
                   <p style={{ fontSize: '17px', fontWeight: 700, color: avColor.text, margin: 0 }}>{avLabel}</p>
@@ -101,9 +122,7 @@ export default async function AssessorProfilePage({ params }: Props) {
                     Next available: <strong>{nextDate}</strong>
                   </p>
                 )}
-                <p style={{ fontSize: '12px', color: avColor.text, margin: 0, opacity: 0.6 }}>
-                  Updated {updatedAt}
-                </p>
+                <p style={{ fontSize: '12px', color: avColor.text, margin: 0, opacity: 0.6 }}>Last updated: {updatedAt}</p>
               </div>
             )}
           </div>
@@ -111,13 +130,14 @@ export default async function AssessorProfilePage({ params }: Props) {
       </div>
 
       {/* Quick summary bar */}
-      <div style={{ background: '#fff', borderBottom: '0.5px solid #e5e7eb' }}>
+      <div style={{ background: '#fff', borderBottom: '0.5px solid #e5e7eb', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
         <Container>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0', padding: '0' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0' }}>
             {[
               { label: 'Conditions', value: assessor.conditions.join(', ') || 'Not specified' },
               { label: 'Location', value: assessor.location_city },
               { label: 'Assessment types', value: assessor.assessment_types.join(', ') || 'Not specified' },
+              { label: 'Availability', value: avLabel },
               ...(assessor.price_range ? [{ label: 'Price range', value: assessor.price_range }] : []),
             ].map((item, i, arr) => (
               <div key={item.label} style={{ padding: '14px 20px', borderRight: i < arr.length - 1 ? '0.5px solid #e5e7eb' : 'none' }}>
@@ -133,7 +153,6 @@ export default async function AssessorProfilePage({ params }: Props) {
         <Container>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)', gap: '24px', alignItems: 'start' }}>
 
-            {/* Left column */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
               {/* Verification */}
@@ -159,28 +178,24 @@ export default async function AssessorProfilePage({ params }: Props) {
               {/* About */}
               {assessor.bio && (
                 <Card title="About">
-                  <p style={{ fontSize: '15px', color: '#374151', lineHeight: 1.85, margin: 0 }}>
-                    {assessor.bio}
-                  </p>
+                  <p style={{ fontSize: '15px', color: '#374151', lineHeight: 1.85, margin: 0 }}>{assessor.bio}</p>
                 </Card>
               )}
 
-              {/* Why choose me */}
+              {/* Why choose */}
               <Card title="Why choose this assessor">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {[
-                    ...(assessor.is_verified ? [{ icon: '✓', text: 'Verified credentials checked by Assessment Finder' }] : []),
-                    ...(assessor.governing_body ? [{ icon: '✓', text: `Registered with ${assessor.governing_body}` }] : []),
-                    ...(avKey === 'within-2-weeks' || avKey === '2-4-weeks' ? [{ icon: '✓', text: 'Short waiting time — appointments available soon' }] : []),
-                    ...(assessor.assessment_types.includes('Remote') ? [{ icon: '✓', text: 'Remote assessments available' }] : []),
-                    ...(assessor.conditions.length > 1 ? [{ icon: '✓', text: `Assesses multiple conditions: ${assessor.conditions.join(', ')}` }] : []),
-                    { icon: '✓', text: 'Real availability shown — updated regularly' },
-                    { icon: '✓', text: 'Contact directly — no referral needed' },
+                    ...(assessor.is_verified ? [{ text: 'Verified credentials checked by Assessment Finder' }] : []),
+                    ...(assessor.governing_body ? [{ text: `Registered with ${assessor.governing_body}` }] : []),
+                    ...(avKey === 'within-2-weeks' || avKey === '2-4-weeks' ? [{ text: 'Short waiting time — appointments available soon' }] : []),
+                    ...(assessor.assessment_types.includes('Remote') ? [{ text: 'Remote assessments available' }] : []),
+                    ...(assessor.conditions.length > 1 ? [{ text: `Assesses multiple conditions: ${assessor.conditions.join(', ')}` }] : []),
+                    { text: 'Real availability shown — updated regularly' },
+                    { text: 'Contact directly — no referral needed' },
                   ].map((item, i) => (
                     <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                      <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#e8f0fa', color: '#1a3a5c', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
-                        {item.icon}
-                      </span>
+                      <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#e8f0fa', color: '#1a3a5c', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>✓</span>
                       <p style={{ fontSize: '14px', color: '#374151', margin: 0, lineHeight: 1.5 }}>{item.text}</p>
                     </div>
                   ))}
@@ -201,6 +216,7 @@ export default async function AssessorProfilePage({ params }: Props) {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {assessor.governing_body && <Row label="Governing body" value={assessor.governing_body} />}
                     {assessor.registration_number && <Row label="Registration no." value={assessor.registration_number} />}
+                    <Row label="Profile last updated" value={updatedAt} />
                     <Row label="Status" value={assessor.is_verified ? '✓ Fully verified' : 'Profile reviewed'} valueColor={assessor.is_verified ? '#166534' : '#6b7280'} />
                   </div>
                 </Card>
@@ -210,30 +226,25 @@ export default async function AssessorProfilePage({ params }: Props) {
 
             {/* Right column */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
               {assessor.price_range && (
                 <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
                   <p style={{ fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.7px', margin: '0 0 8px' }}>Price range</p>
-                  <p style={{ fontSize: '28px', fontWeight: 500, color: '#1a3a5c', margin: '0 0 6px' }}>
-                    {assessor.price_range}
-                  </p>
+                  <p style={{ fontSize: '28px', fontWeight: 500, color: '#1a3a5c', margin: '0 0 6px' }}>{assessor.price_range}</p>
                   <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>Prices may vary. Always confirm directly.</p>
                 </div>
               )}
 
               <div style={{ position: 'sticky', top: '1rem' }}>
                 <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
-                  <h2 style={{ fontSize: '16px', fontWeight: 500, color: '#111827', margin: '0 0 6px' }}>
-                    Contact {firstName}
-                  </h2>
+                  <h2 style={{ fontSize: '16px', fontWeight: 500, color: '#111827', margin: '0 0 6px' }}>Contact {firstName}</h2>
                   <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 1.25rem', lineHeight: 1.5 }}>
                     Send a message to enquire about availability or to arrange an appointment.
                   </p>
                   <ContactForm assessorId={assessor.id} assessorName={assessor.name} />
                 </div>
               </div>
-
             </div>
+
           </div>
         </Container>
       </Section>
@@ -243,7 +254,7 @@ export default async function AssessorProfilePage({ params }: Props) {
         {av && (
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: '13px', fontWeight: 600, color: avColor.text, margin: 0 }}>{avLabel}</p>
-            <p style={{ fontSize: '11px', color: '#6b7280', margin: 0 }}>Updated {updatedAt}</p>
+            <p style={{ fontSize: '11px', color: '#6b7280', margin: 0 }}>Last updated: {updatedAt}</p>
           </div>
         )}
         <a href="#contact-form" style={{ background: '#1a3a5c', color: '#fff', fontSize: '14px', fontWeight: 500, padding: '11px 20px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap' }}>
@@ -287,21 +298,4 @@ function Tag({ label, color = 'navy' }: { label: string; color?: 'navy' | 'blue'
       {label}
     </span>
   )
-}
-
-function formatUpdatedAt(timestamp?: string | null): string {
-  if (!timestamp) return 'recently'
-  const diff = Date.now() - new Date(timestamp).getTime()
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  if (days === 0) return 'today'
-  if (days === 1) return '1 day ago'
-  return `${days} days ago`
-}
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
 }
