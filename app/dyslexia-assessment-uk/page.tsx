@@ -1,216 +1,180 @@
-import { PageLayout, Container, Section } from '@/components/Layout'
-import type { Metadata } from 'next'
+import { PageLayout, Container, Section } from "@/components/Layout";
+import MethodologyBlock from "@/components/MethodologyBlock";
+import EditorialAttribution from "@/components/EditorialAttribution";
+import WhatThisMeans from "@/components/WhatThisMeans";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Dyslexia Assessment UK — Waiting Times, Costs and Availability | Assessment Finder',
-  description: 'A complete guide to dyslexia assessments in the UK. Compare NHS and private waiting times, understand costs, and find assessors with current availability.',
-}
-
-const LOCATIONS = [
-  { city: 'London', href: '/dyslexia-assessment-london' },
-  { city: 'Manchester', href: '/dyslexia-assessment-manchester' },
-  { city: 'Birmingham', href: '/dyslexia-assessment-birmingham' },
-  { city: 'Bristol', href: '/dyslexia-assessment-bristol' },
-  { city: 'Leeds', href: '/dyslexia-assessment-leeds' },
-  { city: 'Edinburgh', href: '/dyslexia-assessment-edinburgh' },
-  { city: 'Glasgow', href: '/dyslexia-assessment-glasgow' },
-]
-
-const faqSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: 'How long does a dyslexia assessment take in the UK?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'A dyslexia assessment in the UK typically takes two to four hours and is usually completed in a single session. A written report is usually provided within one to two weeks.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'How much does a private dyslexia assessment cost in the UK?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Private dyslexia assessments in the UK typically cost between £400 and £800 for adults, and may cost more for children depending on the scope of the assessment.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Can adults get a dyslexia assessment in the UK?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. Adult dyslexia assessments are available in the UK through private providers. Many adults seek assessment to understand learning difficulties or to access workplace accommodations.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Who can assess for dyslexia in the UK?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'In the UK, dyslexia assessments may be carried out by educational psychologists or specialist teachers with an Assessment Practising Certificate (APC). Providers are typically registered with the HCPC or the British Dyslexia Association.',
-      },
-    },
-  ],
-}
+  title: "Dyslexia Assessment UK | Private Dyslexia Testing | Assessment Finder",
+  description:
+    "Find private dyslexia assessment providers across the UK. Compare waiting times, prices and assessment types for adults and children.",
+};
 
 export default function DyslexiaAssessmentUKPage() {
   return (
     <PageLayout>
+      <Container>
+        <Section>
+          <div className="max-w-4xl mx-auto py-10">
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-
-      <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #1e4a72 100%)', padding: '2.5rem 0 3rem' }}>
-        <Container>
-          <a href="/" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', textDecoration: 'none', display: 'inline-block', marginBottom: '1.25rem' }}>
-            Back to all assessors
-          </a>
-          <h1 style={{ color: '#fff', fontSize: '28px', fontWeight: 500, margin: '0 0 10px', lineHeight: 1.3 }}>
-            Dyslexia Assessment in the UK
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', maxWidth: '580px', margin: '0 0 1.5rem', lineHeight: 1.7 }}>
-            A guide to dyslexia assessments in the UK, including waiting times, costs, and how to find a qualified assessor near you.
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-            {[
-              { label: 'Typical duration', value: '2–4 hours' },
-              { label: 'Private wait', value: '1–4 weeks' },
-              { label: 'Typical cost', value: '£400–£800' },
-            ].map((item) => (
-              <div key={item.label} style={{ background: 'rgba(255,255,255,0.08)', border: '0.5px solid rgba(255,255,255,0.15)', borderRadius: '10px', padding: '10px 16px' }}>
-                <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.7px', margin: '0 0 3px', fontWeight: 500 }}>{item.label}</p>
-                <p style={{ fontSize: '15px', fontWeight: 600, color: '#fff', margin: 0 }}>{item.value}</p>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </div>
-
-      <Section>
-        <Container>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)', gap: '24px', alignItems: 'start' }}>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-              <Card title="What is a dyslexia assessment?">
-                <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
-                  A dyslexia assessment is a structured evaluation used to identify whether a person has dyslexia or other specific learning differences. In the UK, assessments are carried out by educational psychologists or specialist teachers holding an Assessment Practising Certificate (APC).
-                </p>
-                <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
-                  A standard dyslexia assessment typically includes standardised tests of reading, spelling, writing, and cognitive processing, along with a written report. The assessment usually takes two to four hours and is completed in a single session.
-                </p>
-                <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, margin: 0 }}>
-                  A formal dyslexia assessment report can be used to access support in education or the workplace, including exam accommodations or reasonable adjustments under the Equality Act 2010.
-                </p>
-              </Card>
-
-              <Card title="NHS vs private dyslexia assessments in the UK">
-                <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
-                  Unlike ADHD and autism assessments, dyslexia assessments are not routinely provided by the NHS. In practice, most people access dyslexia assessments through private providers, schools, or local authorities.
-                </p>
-                <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
-                  Private dyslexia assessments in the UK are typically available within one to four weeks. Based on providers listed on Assessment Finder, appointments are often available relatively quickly compared to ADHD or autism assessments.
-                </p>
-                <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, margin: 0 }}>
-                  Private dyslexia assessments in the UK typically cost between £400 and £800 for adults. Assessments for children may cost more depending on the depth of the evaluation and the assessor's qualifications.
-                </p>
-              </Card>
-
-              <Card title="Dyslexia assessments for adults in the UK">
-                <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
-                  Adult dyslexia assessments are widely available in the UK through private providers. Many adults seek assessment to access workplace accommodations, support in higher education, or simply to better understand their learning profile.
-                </p>
-                <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, margin: 0 }}>
-                  A formal adult dyslexia assessment report from a qualified assessor may be accepted by employers and higher education institutions as evidence for reasonable adjustments. Assessment Finder lists private assessors offering adult dyslexia assessments across the UK.
-                </p>
-              </Card>
-
-              <Card title="Who can assess for dyslexia in the UK?">
-                <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
-                  In the UK, dyslexia assessments may be conducted by educational psychologists registered with the HCPC, or by specialist teachers holding a current Assessment Practising Certificate (APC) recognised by the British Dyslexia Association (BDA) or SASC.
-                </p>
-                <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, margin: 0 }}>
-                  Assessment Finder only lists providers registered with a recognised UK professional body. All profiles are reviewed before publication to ensure professional standards are met.
-                </p>
-              </Card>
-
-              <Card title="Related questions">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-                  {[
-                    { q: 'What is involved in a dyslexia assessment?', href: '/articles/dyslexia-assessment-uk-guide' },
-                    { q: 'What is the difference between NHS and private assessments?', href: '/articles/nhs-vs-private-assessment-uk' },
-                    { q: 'How much does a private dyslexia assessment cost?', href: '/articles/dyslexia-assessment-uk-guide' },
-                    { q: 'Can I get a dyslexia assessment as an adult?', href: '/articles/dyslexia-assessment-uk-guide' },
-                  ].map((item, i, arr) => (
-                    <a key={i} href={item.href} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: i < arr.length - 1 ? '0.5px solid #f3f4f6' : 'none', textDecoration: 'none', gap: '12px' }}>
-                      <p style={{ fontSize: '14px', color: '#1a3a5c', margin: 0, fontWeight: 500 }}>{item.q}</p>
-                      <span style={{ color: '#9ca3af', flexShrink: 0 }}>→</span>
-                    </a>
-                  ))}
-                </div>
-              </Card>
-
+            {/* Answer Block */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Private Dyslexia Assessment in the UK
+              </h1>
+              <p className="text-gray-700 leading-relaxed">
+                Private dyslexia assessments in the UK are carried out by specialist assessors,
+                typically chartered psychologists or specialist teachers holding an Assessment
+                Practising Certificate (APC). A full assessment involves standardised literacy,
+                phonological and cognitive tests and results in a detailed diagnostic report.
+                Costs typically range from £400 to £900.
+              </p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', position: 'sticky', top: '1rem' }}>
-
-              <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
-                <h3 style={{ fontSize: '13px', fontWeight: 600, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 1rem', paddingBottom: '0.75rem', borderBottom: '0.5px solid #e5e7eb' }}>
-                  Find an assessor by city
-                </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {LOCATIONS.map((loc) => (
-                    <a key={loc.href} href={loc.href} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '14px', color: '#1a3a5c', textDecoration: 'none', padding: '8px 10px', borderRadius: '6px', background: '#f0f4f8' }}>
-                      Dyslexia assessment {loc.city}
-                      <span style={{ color: '#9ca3af' }}>→</span>
-                    </a>
-                  ))}
-                </div>
+            {/* Quick Summary */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+              <div style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '12px', padding: '1.25rem', textAlign: 'center' }}>
+                <p style={{ fontSize: '22px', fontWeight: 700, color: '#1a3a5c', margin: '0 0 4px' }}>1–4 weeks</p>
+                <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Typical private wait time</p>
               </div>
-
-              <div style={{ background: '#f0fdf4', borderRadius: '12px', border: '0.5px solid #86efac', padding: '1.25rem' }}>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: '#166534', margin: '0 0 6px' }}>Quick facts</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {[
-                    'Duration: 2–4 hours typical',
-                    'Private wait: 1–4 weeks typical',
-                    'Cost: £400–£800',
-                    'Regulated by HCPC or BDA/SASC',
-                    'Available for adults and children',
-                  ].map((fact, i) => (
-                    <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                      <span style={{ color: '#22c55e', flexShrink: 0, fontSize: '13px' }}>✓</span>
-                      <p style={{ fontSize: '13px', color: '#166534', margin: 0, lineHeight: 1.5 }}>{fact}</p>
-                    </div>
-                  ))}
-                </div>
+              <div style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '12px', padding: '1.25rem', textAlign: 'center' }}>
+                <p style={{ fontSize: '22px', fontWeight: 700, color: '#1a3a5c', margin: '0 0 4px' }}>£400–£900</p>
+                <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Typical assessment cost</p>
               </div>
-
-              <div style={{ background: '#1a3a5c', borderRadius: '12px', padding: '1.25rem', textAlign: 'center' }}>
-                <p style={{ color: '#fff', fontSize: '14px', fontWeight: 500, margin: '0 0 8px' }}>Find a dyslexia assessor</p>
-                <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '13px', margin: '0 0 12px' }}>Compare availability and credentials across the UK.</p>
-                <a href="/" style={{ display: 'block', background: '#4ade80', color: '#1a3a5c', fontSize: '13px', fontWeight: 600, padding: '9px', borderRadius: '8px', textDecoration: 'none' }}>
-                  Search assessors
-                </a>
+              <div style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '12px', padding: '1.25rem', textAlign: 'center' }}>
+                <p style={{ fontSize: '22px', fontWeight: 700, color: '#1a3a5c', margin: '0 0 4px' }}>Adults & children</p>
+                <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>Assessments available</p>
               </div>
-
             </div>
-          </div>
-        </Container>
-      </Section>
 
+            {/* Availability Insights */}
+            <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#111827', marginBottom: '12px' }}>Availability Insights</h2>
+            <p style={{ fontSize: '15px', color: '#374151', lineHeight: 1.75, marginBottom: '12px' }}>
+              Private dyslexia assessments are generally more readily available than ADHD or
+              autism assessments, with shorter waiting times across most regions. Availability
+              varies between providers and is subject to change. Remote dyslexia assessments
+              are available from some providers, broadening access for those in areas with
+              limited local provision.
+            </p>
+            <WhatThisMeans>
+              Dyslexia assessments tend to have shorter waiting times than other assessment
+              types. If you need an assessment for workplace or educational purposes, starting
+              with a provider who offers remote assessments may give you the quickest access.
+            </WhatThisMeans>
+            <MethodologyBlock condition="dyslexia" />
+
+            {/* Comparison Section */}
+            <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#111827', margin: '2rem 0 12px' }}>
+              Who Can Assess for Dyslexia?
+            </h2>
+            <div style={{ overflowX: 'auto', marginBottom: '1.5rem' }}>
+              <table style={{ width: '100%', fontSize: '14px', borderCollapse: 'collapse', border: '0.5px solid #d1dce8', borderRadius: '12px', overflow: 'hidden' }}>
+                <thead style={{ background: '#f0f4f8' }}>
+                  <tr>
+                    <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 600, color: '#374151' }}>Assessor type</th>
+                    <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 600, color: '#374151' }}>Can diagnose?</th>
+                    <th style={{ textAlign: 'left', padding: '12px 16px', fontWeight: 600, color: '#374151' }}>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderTop: '0.5px solid #e5e7eb' }}>
+                    <td style={{ padding: '12px 16px', color: '#374151', fontWeight: 500 }}>Chartered Psychologist</td>
+                    <td style={{ padding: '12px 16px', color: '#374151' }}>Yes</td>
+                    <td style={{ padding: '12px 16px', color: '#374151' }}>Full diagnostic report</td>
+                  </tr>
+                  <tr style={{ borderTop: '0.5px solid #e5e7eb', background: '#f9fafb' }}>
+                    <td style={{ padding: '12px 16px', color: '#374151', fontWeight: 500 }}>Specialist Teacher (APC)</td>
+                    <td style={{ padding: '12px 16px', color: '#374151' }}>Yes</td>
+                    <td style={{ padding: '12px 16px', color: '#374151' }}>Accepted for most educational and employment purposes</td>
+                  </tr>
+                  <tr style={{ borderTop: '0.5px solid #e5e7eb' }}>
+                    <td style={{ padding: '12px 16px', color: '#374151', fontWeight: 500 }}>Educational Psychologist</td>
+                    <td style={{ padding: '12px 16px', color: '#374151' }}>Yes</td>
+                    <td style={{ padding: '12px 16px', color: '#374151' }}>Often required for EHC plan assessments</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Remote Assessments */}
+            <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#111827', margin: '2rem 0 12px' }}>
+              Remote Dyslexia Assessments
+            </h2>
+            <p style={{ fontSize: '15px', color: '#374151', lineHeight: 1.75, marginBottom: '12px' }}>
+              Remote dyslexia assessments are available from a growing number of providers.
+              These assessments are typically conducted via video call using digital versions
+              of standardised tests. Remote assessments are suitable for most adults seeking
+              a dyslexia assessment for workplace or higher education purposes.
+            </p>
+            <WhatThisMeans>
+              Remote dyslexia assessments are widely accepted by universities and employers
+              for reasonable adjustments. Confirm with your provider that their remote
+              assessment meets the requirements of your specific institution or employer.
+            </WhatThisMeans>
+
+            {/* Find a Provider CTA */}
+            <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #1e4a72 100%)', borderRadius: '12px', padding: '1.75rem', textAlign: 'center', margin: '2rem 0' }}>
+              <p style={{ color: '#fff', fontSize: '17px', fontWeight: 500, margin: '0 0 8px' }}>Find a dyslexia assessor near you</p>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', margin: '0 0 1.25rem' }}>
+                Search by location and compare providers with current availability.
+              </p>
+              <a href="/" style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '14px', fontWeight: 600, padding: '10px 24px', borderRadius: '8px', textDecoration: 'none' }}>
+                Search assessors
+              </a>
+            </div>
+
+            {/* FAQ */}
+            <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#111827', margin: '2rem 0 12px' }}>
+              Frequently Asked Questions
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {[
+                {
+                  q: "What does a private dyslexia assessment involve?",
+                  a: "A dyslexia assessment involves standardised tests of reading, writing, spelling, phonological processing and cognitive ability. The assessor will also take a background history. The process typically takes two to three hours and results in a written diagnostic report.",
+                },
+                {
+                  q: "Is a private dyslexia assessment accepted by universities?",
+                  a: "Yes. Most UK universities accept a dyslexia diagnosis from a chartered psychologist or a specialist teacher with an Assessment Practising Certificate (APC) for the purposes of Disabled Students' Allowance (DSA) and reasonable adjustments.",
+                },
+                {
+                  q: "Do I need a dyslexia assessment for workplace support?",
+                  a: "A formal assessment and report is the most reliable way to access workplace reasonable adjustments under the Equality Act 2010. Some employers may accept an existing report if it is recent enough.",
+                },
+                {
+                  q: "Can children get a private dyslexia assessment?",
+                  a: "Yes. Many providers on Assessment Finder offer dyslexia assessments for children. Assessment approaches differ for children and adults, and providers experienced in child assessment are identified in their profiles.",
+                },
+              ].map(({ q, a }) => (
+                <div key={q} style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '12px', padding: '1.25rem' }}>
+                  <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#111827', margin: '0 0 8px' }}>{q}</h3>
+                  <p style={{ fontSize: '14px', color: '#374151', lineHeight: 1.75, margin: 0 }}>{a}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Related Questions */}
+            <div style={{ background: '#fff', border: '0.5px solid #d1dce8', borderRadius: '12px', padding: '1.25rem', margin: '1.5rem 0' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#111827', margin: '0 0 12px' }}>Related Questions</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                {[
+                  { q: 'How do I get a private ADHD assessment in the UK?', href: '/adhd-assessment-uk' },
+                  { q: 'How do I get a private autism assessment in the UK?', href: '/autism-assessment-uk' },
+                  { q: 'What should I look for when choosing an assessor?', href: '/articles' },
+                ].map((item, i, arr) => (
+                  <a key={item.href} href={item.href} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: i < arr.length - 1 ? '0.5px solid #f3f4f6' : 'none', textDecoration: 'none' }}>
+                    <span style={{ fontSize: '14px', color: '#1a3a5c', fontWeight: 500 }}>{item.q}</span>
+                    <span style={{ color: '#9ca3af', flexShrink: 0 }}>→</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <EditorialAttribution lastUpdated="7 May 2025" />
+
+          </div>
+        </Section>
+      </Container>
     </PageLayout>
-  )
-}
-
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ background: '#fff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.5rem' }}>
-      <h2 style={{ fontSize: '17px', fontWeight: 500, color: '#111827', margin: '0 0 1rem', paddingBottom: '0.75rem', borderBottom: '0.5px solid #e5e7eb' }}>
-        {title}
-      </h2>
-      {children}
-    </div>
-  )
+  );
 }

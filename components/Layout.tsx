@@ -38,7 +38,7 @@ export function PageLayout({ children }: PageLayoutProps) {
   ]
 
   return (
-    <div style={{ background: '#f0f4f8', minHeight: '100vh', fontFamily: 'inherit' }}>
+    <div style={{ background: '#f0f4f8', minHeight: '100vh', fontFamily: 'inherit', display: 'flex', flexDirection: 'column' }}>
       <nav style={{ background: '#1a3a5c', padding: '0 2rem', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 100 }}>
 
         <a href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
@@ -93,7 +93,37 @@ export function PageLayout({ children }: PageLayoutProps) {
         <div onClick={() => setLocationsOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 99 }} />
       )}
 
-      <main>{children}</main>
+      <main style={{ flex: 1 }}>{children}</main>
+
+      {/* Footer */}
+      <footer style={{ background: '#1a3a5c', borderTop: '0.5px solid rgba(255,255,255,0.1)', padding: '2rem 0', marginTop: 'auto' }}>
+        <Container>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+            <a href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
+              <span style={{ fontSize: '15px', fontWeight: 500, color: '#fff', letterSpacing: '-0.3px' }}>
+                Assessment<span style={{ color: '#4ade80' }}>Finder</span>
+              </span>
+            </a>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '20px' }}>
+              <a href="/adhd-assessment-uk" style={footerLink}>ADHD Assessment UK</a>
+              <a href="/autism-assessment-uk" style={footerLink}>Autism Assessment UK</a>
+              <a href="/dyslexia-assessment-uk" style={footerLink}>Dyslexia Assessment UK</a>
+              <a href="/articles" style={footerLink}>Articles</a>
+              <a href="/editorial-standards" style={footerLink}>Editorial Standards</a>
+              <a href="/list-your-practice" style={footerLink}>For Assessors</a>
+            </div>
+          </div>
+          <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.1)', marginTop: '1.5rem', paddingTop: '1.25rem' }}>
+            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', margin: 0 }}>
+              © {new Date().getFullYear()} Assessment Finder. Provider information is self-reported. Always verify credentials independently.{' '}
+              <a href="/editorial-standards" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'underline' }}>
+                Editorial standards
+              </a>
+            </p>
+          </div>
+        </Container>
+      </footer>
+
     </div>
   )
 }
@@ -114,5 +144,11 @@ export function Section({ children, style }: SectionProps) {
 const navLink: React.CSSProperties = {
   color: 'rgba(255,255,255,0.75)',
   fontSize: '14px',
+  textDecoration: 'none',
+}
+
+const footerLink: React.CSSProperties = {
+  color: 'rgba(255,255,255,0.6)',
+  fontSize: '13px',
   textDecoration: 'none',
 }

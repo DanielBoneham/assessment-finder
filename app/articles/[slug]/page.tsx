@@ -53,6 +53,7 @@ export default async function ArticlePage({ params }: Props) {
     headline: article.title,
     description: article.metaDescription,
     datePublished: article.publishedDate,
+    dateModified: '2025-05-07',
     publisher: {
       '@type': 'Organization',
       name: 'Assessment Finder',
@@ -103,6 +104,16 @@ export default async function ArticlePage({ params }: Props) {
                 </p>
               )
             })}
+
+            {/* Editorial attribution */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', borderTop: '0.5px solid #e5e7eb', marginTop: '1.75rem', paddingTop: '1rem' }}>
+              <svg style={{ width: '14px', height: '14px', color: '#9ca3af', flexShrink: 0 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span style={{ fontSize: '12px', color: '#9ca3af' }}>
+                Reviewed by the Assessment Finder editorial team · Last updated 7 May 2025
+              </span>
+            </div>
           </div>
 
           {/* Related questions */}
