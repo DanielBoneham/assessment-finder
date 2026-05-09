@@ -1,5 +1,5 @@
 import { getAssessors, AssessorWithAvailability, fastestAvailability } from '@/lib/api'
-import { PageLayout, Container, Section } from '@/components/Layout'
+import { PageLayout, Container } from '@/components/Layout'
 import { AssessorGrid } from '@/components/AssessorGrid'
 import { HeroSearch } from '@/components/HeroSearch'
 
@@ -48,47 +48,34 @@ export default async function HomePage() {
   return (
     <PageLayout>
 
-      {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #1e4a72 60%, #1a3a5c 100%)', padding: '4rem 0 5rem' }}>
+      {/* ── Hero ── */}
+      <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #1e4a72 60%, #1a3a5c 100%)', padding: '2.75rem 0 3rem' }}>
         <Container style={{ textAlign: 'center' }}>
-          <h1 style={{ color: '#fff', fontSize: '34px', fontWeight: 500, lineHeight: 1.3, maxWidth: '620px', margin: '0 auto 1rem', letterSpacing: '-0.3px' }}>
+          <h1 style={{ color: '#fff', fontSize: '32px', fontWeight: 500, lineHeight: 1.3, maxWidth: '600px', margin: '0 auto 0.75rem', letterSpacing: '-0.3px' }}>
             Find Private ADHD, Autism and Dyslexia Assessors Near You
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '17px', maxWidth: '500px', margin: '0 auto 2.25rem', lineHeight: 1.75 }}>
-            See who has availability in the next few weeks. Compare assessors, check credentials, and get in touch directly.
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '16px', maxWidth: '460px', margin: '0 auto 1.75rem', lineHeight: 1.65 }}>
+            Compare assessors, check availability and contact providers directly.
           </p>
           <HeroSearch />
 
           {fastest && (
-            <div style={{ marginTop: '2rem', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(74,222,128,0.12)', border: '0.5px solid rgba(74,222,128,0.35)', borderRadius: '10px', padding: '10px 20px' }}>
-              <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#4ade80', flexShrink: 0 }} />
-              <p style={{ color: '#fff', fontSize: '15px', fontWeight: 500, margin: 0 }}>
+            <div style={{ marginTop: '1.5rem', display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(74,222,128,0.12)', border: '0.5px solid rgba(74,222,128,0.35)', borderRadius: '10px', padding: '9px 18px' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ade80', flexShrink: 0 }} />
+              <p style={{ color: '#fff', fontSize: '14px', fontWeight: 500, margin: 0 }}>
                 Fastest current UK availability: <span style={{ color: '#4ade80' }}>{fastest}</span>
               </p>
             </div>
           )}
-
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '32px', marginTop: '2rem' }}>
-            {[
-              { value: '10+', label: 'Assessors listed' },
-              { value: 'Verified', label: 'Profiles reviewed' },
-              { value: 'Free', label: 'To search and contact' },
-            ].map((stat) => (
-              <div key={stat.label} style={{ textAlign: 'center' }}>
-                <p style={{ color: '#4ade80', fontSize: '22px', fontWeight: 600, margin: '0 0 3px' }}>{stat.value}</p>
-                <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '12px', margin: 0 }}>{stat.label}</p>
-              </div>
-            ))}
-          </div>
         </Container>
       </div>
 
-      {/* Trust bar */}
+      {/* ── Trust strip ── */}
       <div style={{ background: '#fff', borderBottom: '0.5px solid #e5e7eb', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
         <Container>
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '28px', padding: '16px 0' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '24px', padding: '13px 0' }}>
             {[
-              '✓ All profiles reviewed before publication',
+              '✓ Profiles reviewed before publication',
               '✓ Registered with BPS, HCPC or GMC',
               '✓ Real availability shown',
               '✓ Contact assessors directly',
@@ -99,66 +86,75 @@ export default async function HomePage() {
         </Container>
       </div>
 
-      {/* How it works */}
-      <Section style={{ background: 'linear-gradient(180deg, #f0f4f8 0%, #f8fafc 100%)', padding: '3.5rem 0' }}>
-        <Container>
-          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <p style={{ fontSize: '11px', fontWeight: 600, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '1.2px', margin: '0 0 10px' }}>How it works</p>
-            <h2 style={{ fontSize: '24px', fontWeight: 500, color: '#111827', margin: 0, letterSpacing: '-0.2px' }}>Find an assessor in three steps</h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-            {[
-              { step: '1', icon: '🔍', title: 'Search', body: 'Enter your location and choose the type of assessment you need.' },
-              { step: '2', icon: '📅', title: 'Compare', body: 'See assessors sorted by fastest availability and compare credentials.' },
-              { step: '3', icon: '✉️', title: 'Contact', body: 'Send a message directly to the assessor and arrange your appointment.' },
-            ].map((item) => (
-              <div key={item.step} style={{ background: '#fff', borderRadius: '14px', border: '0.5px solid #e5e7eb', padding: '1.75rem', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#e8f0fa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
-                    {item.icon}
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 2px' }}>Step {item.step}</p>
-                    <p style={{ fontSize: '17px', fontWeight: 500, color: '#111827', margin: 0 }}>{item.title}</p>
-                  </div>
-                </div>
-                <p style={{ fontSize: '14px', color: '#6b7280', margin: 0, lineHeight: 1.65 }}>{item.body}</p>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </Section>
-
-      {/* Featured assessors */}
+      {/* ── Featured assessors ── */}
       {featured.length > 0 && (
-        <Section style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #f0f4f8 100%)', padding: '3rem 0' }}>
+        <div style={{ background: '#f8fafc', padding: '2.5rem 0' }}>
           <Container>
-            <SectionLabel>Featured assessors</SectionLabel>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <SectionLabel>Featured assessors</SectionLabel>
+              <a href="#all-assessors" style={{ fontSize: '13px', color: '#1a3a5c', textDecoration: 'none', fontWeight: 500 }}>View all →</a>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
               {featured.map((assessor) => (
                 <AssessorCard key={assessor.id} assessor={assessor} />
               ))}
             </div>
           </Container>
-        </Section>
+        </div>
       )}
 
-      {/* Recently updated */}
+      {/* ── Recently updated availability ── */}
       {recentlyUpdated.length > 0 && (
-        <Section style={{ background: 'linear-gradient(180deg, #f0f4f8 0%, #f8fafc 100%)', padding: '3rem 0' }}>
+        <div style={{ background: '#f0f4f8', padding: '2.5rem 0' }}>
           <Container>
-            <SectionLabel>Recently updated availability</SectionLabel>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <SectionLabel>Recently updated availability</SectionLabel>
+              <span style={{ fontSize: '12px', color: '#6b7280' }}>Updated by providers directly</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
               {recentlyUpdated.map((assessor) => (
                 <AssessorCard key={assessor.id} assessor={assessor} />
               ))}
             </div>
           </Container>
-        </Section>
+        </div>
       )}
 
-      {/* Popular searches */}
-      <Section style={{ background: '#f8fafc', padding: '3rem 0' }}>
+      {/* ── Compact how it works strip ── */}
+      <div style={{ background: '#fff', borderTop: '0.5px solid #e5e7eb', borderBottom: '0.5px solid #e5e7eb' }}>
+        <Container>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0', padding: '1.25rem 0' }}>
+            {[
+              { icon: '🔍', text: 'Search by location and condition' },
+              { icon: '📅', text: 'Compare availability and credentials' },
+              { icon: '✉️', text: 'Contact providers directly' },
+            ].map((item, i, arr) => (
+              <div key={item.text} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 28px', borderRight: i < arr.length - 1 ? '0.5px solid #e5e7eb' : 'none' }}>
+                <span style={{ fontSize: '18px' }}>{item.icon}</span>
+                <span style={{ fontSize: '13px', color: '#374151', fontWeight: 500 }}>{item.text}</span>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </div>
+
+      {/* ── All assessors ── */}
+      <div id="all-assessors" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #f0f4f8 100%)', padding: '2.5rem 0' }}>
+        <Container>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+            <SectionLabel>All assessors — sorted by fastest availability</SectionLabel>
+          </div>
+          {error && (
+            <p style={{ color: '#991b1b', fontSize: '14px', background: '#fee2e2', padding: '1rem', borderRadius: '8px', marginBottom: '1.25rem' }}>
+              Could not load assessors. Please check your Supabase connection.
+            </p>
+          )}
+          {!error && <AssessorGrid assessors={sorted} />}
+        </Container>
+      </div>
+
+      {/* ── Popular searches ── */}
+      <div style={{ background: '#f0f4f8', padding: '2.5rem 0' }}>
         <Container>
           <SectionLabel>Popular searches</SectionLabel>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
@@ -182,60 +178,42 @@ export default async function HomePage() {
             ))}
           </div>
         </Container>
-      </Section>
+      </div>
 
-      {/* All assessors */}
-      <Section style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #f0f4f8 100%)', padding: '3rem 0' }}>
+      {/* ── For assessors CTA ── */}
+      <div style={{ background: '#f0f4f8', padding: '0 0 2.5rem' }}>
         <Container>
-          <SectionLabel>All assessors — sorted by fastest availability</SectionLabel>
-          {error && (
-            <p style={{ color: '#991b1b', fontSize: '14px', background: '#fee2e2', padding: '1rem', borderRadius: '8px', marginBottom: '1.25rem' }}>
-              Could not load assessors. Please check your Supabase connection.
-            </p>
-          )}
-          {!error && <AssessorGrid assessors={sorted} />}
-        </Container>
-      </Section>
-
-      {/* For Assessors CTA */}
-      <Section style={{ background: '#f0f4f8', padding: '3rem 0' }}>
-        <Container>
-          <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #1e4a72 100%)', borderRadius: '16px', padding: '2.5rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem', boxShadow: '0 4px 24px rgba(26,58,92,0.2)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #1e4a72 100%)', borderRadius: '16px', padding: '2.25rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem', boxShadow: '0 4px 24px rgba(26,58,92,0.2)' }}>
             <div>
-              <p style={{ color: '#fff', fontSize: '20px', fontWeight: 500, margin: '0 0 8px', letterSpacing: '-0.2px' }}>Are you an assessor?</p>
-              <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '15px', margin: 0, lineHeight: 1.6 }}>
-                List your practice for free and get discovered by people searching for assessments near them.
+              <p style={{ color: '#fff', fontSize: '19px', fontWeight: 500, margin: '0 0 6px', letterSpacing: '-0.2px' }}>Are you an assessor?</p>
+              <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '14px', margin: 0, lineHeight: 1.6 }}>
+                List your practice and get discovered by people searching for assessments near them.
               </p>
             </div>
-            <a href="/list-your-practice" style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '14px', fontWeight: 600, padding: '13px 26px', borderRadius: '10px', textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(74,222,128,0.3)' }}>
+            <a href="/list-your-practice" style={{ display: 'inline-block', background: '#4ade80', color: '#1a3a5c', fontSize: '14px', fontWeight: 600, padding: '12px 24px', borderRadius: '10px', textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(74,222,128,0.3)' }}>
               List your practice
             </a>
           </div>
         </Container>
-      </Section>
+      </div>
 
-      {/* SEO block */}
-      <Section style={{ background: '#f0f4f8', paddingTop: 0, padding: '0 0 3rem' }}>
+      {/* ── SEO / GEO block ── */}
+      <div style={{ background: '#f0f4f8', padding: '0 0 3rem' }}>
         <Container>
-          <div style={{ background: '#fff', borderRadius: '14px', border: '0.5px solid #e5e7eb', padding: '2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 500, margin: '0 0 1.25rem', color: '#111827', letterSpacing: '-0.2px' }}>
+          <div style={{ background: '#fff', borderRadius: '14px', border: '0.5px solid #e5e7eb', padding: '1.75rem', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <h2 style={{ fontSize: '17px', fontWeight: 500, margin: '0 0 1rem', color: '#111827', letterSpacing: '-0.2px' }}>
               ADHD, autism and dyslexia assessments in the UK
             </h2>
-            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.85, marginBottom: '0.85rem' }}>
-              ADHD assessment waiting times in the UK can vary significantly depending on whether you go through the NHS or a private provider.
+            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+              NHS waiting times for ADHD, autism and dyslexia assessments can exceed 12 months in many areas. Private assessments are typically faster, with availability ranging from a few weeks to a few months depending on the provider.
             </p>
-            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.85, marginBottom: '0.85rem' }}>
-              NHS waiting times can often exceed 6 to 12 months in many areas. Private assessments are typically much faster, with availability ranging from a few weeks to a few months.
-            </p>
-            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.85, marginBottom: '0.85rem' }}>
-              Because availability differs between providers, many people choose to compare assessors to find those with shorter waiting times.
-            </p>
-            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.85, margin: 0 }}>
-              Assessment Finder helps you identify assessors with current availability, so you can access support sooner.
+            <p style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.8, margin: 0 }}>
+              Assessment Finder helps you identify providers with current availability across the UK, so you can access support sooner. All profiles are reviewed before publication.{' '}
+              <a href="/editorial-standards" style={{ color: '#1a3a5c', fontWeight: 500 }}>Editorial standards →</a>
             </p>
           </div>
         </Container>
-      </Section>
+      </div>
 
     </PageLayout>
   )
@@ -243,7 +221,7 @@ export default async function HomePage() {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ fontSize: '11px', fontWeight: 600, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '1.5rem' }}>
+    <p style={{ fontSize: '11px', fontWeight: 600, color: '#1a3a5c', textTransform: 'uppercase', letterSpacing: '1.2px', margin: 0 }}>
       {children}
     </p>
   )
