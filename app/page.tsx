@@ -263,20 +263,32 @@ function AssessorCard({ assessor }: { assessor: AssessorWithAvailability }) {
     '1-3-months': '1 to 3 months',
     '3-plus-months': '3+ months',
   }
-  function idToSeed(id: string): number {
+
+  const FEMALE_FIRST_NAMES = ['sophie', 'lena', 'priya', 'amelia', 'rachel', 'sarah', 'daniella']
+
+  function getPhotoUrl(id: string, name: string): string {
+    const first = name.split(' ')[0].toLowerCase().replace(/^(dr|mr|mrs|ms)\.?\s*/i, '')
+    const isFemale = FEMALE_FIRST_NAMES.some((n) => first.includes(n))
+    const gender = isFemale ? 'women' : 'men'
     let hash = 0
     for (let i = 0; i < id.length; i++) { hash = (hash << 5) - hash + id.charCodeAt(i); hash |= 0 }
-    return Math.abs(hash) % 70 + 1
+    const seed = (Math.abs(hash) % 40) + 1
+    return `https://randomuser.me/api/portraits/${gender}/${seed}.jpg`
   }
-  const seed = idToSeed(assessor.id)
-  const photoUrl = assessor.photo_url || `https://randomuser.me/api/portraits/${seed % 2 === 0 ? 'women' : 'men'}/${seed}.jpg`
 
-  const cardStyle: React.CSSProperties = { background: '#fff', borderRadius: '12px', border: '0.5px solid #e2e8f0', padding: '1.1rem', display: 'flex', flexDirection: 'column', gap: '10px', boxShadow: '0 1px 4px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04)' }
+  const photoUrl = assessor.photo_url || getPhotoUrl(assessor.id, assessor.name)
+
+  const cardStyle: React.CSSProperties = { background: '#fff', borderRadius: '12px', border: '0.5px solid #e2e8f0', padding: '1.1rem', display: 'flex', flexDirection: 'column', gap: '10px', boxShadow: '0 1px 4px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04)', position: 'relative' }
   const badgeStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: colors.bg, border: `0.5px solid ${colors.border}`, borderRadius: '8px', padding: '8px 12px' }
   const ctaStyle: React.CSSProperties = { display: 'block', textAlign: 'center', background: '#f8fafc', color: '#1a3a5c', fontSize: '13px', fontWeight: 500, padding: '8px', borderRadius: '8px', textDecoration: 'none', border: '0.5px solid #e2e8f0', marginTop: 'auto' }
 
   return (
     <div style={cardStyle}>
+      {assessor.is_demo && (
+        <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#f3f4f6', color: '#9ca3af', fontSize: '10px', fontWeight: 600, padding: '2px 8px', borderRadius: '20px', letterSpacing: '0.4px', textTransform: 'uppercase' }}>
+          Demo
+        </div>
+      )}
       <div style={badgeStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
           <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: colors.dot, flexShrink: 0 }} />
