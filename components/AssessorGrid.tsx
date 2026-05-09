@@ -56,22 +56,14 @@ export function AssessorGrid({ assessors }: AssessorGridProps) {
   return (
     <div id="assessor-grid">
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '1.5rem', alignItems: 'center' }}>
-        <select
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          style={selectStyle}
-        >
+        <select value={city} onChange={(e) => setCity(e.target.value)} style={selectStyle}>
           <option value="">All locations</option>
           {cities.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
 
-        <select
-          value={condition}
-          onChange={(e) => setCondition(e.target.value)}
-          style={selectStyle}
-        >
+        <select value={condition} onChange={(e) => setCondition(e.target.value)} style={selectStyle}>
           <option value="">All conditions</option>
           {CONDITIONS.map((c) => (
             <option key={c} value={c}>{c}</option>
@@ -113,6 +105,7 @@ export function AssessorGrid({ assessors }: AssessorGridProps) {
               availability={assessor.availability?.availability_range ?? '3-plus-months'}
               updatedAt={formatUpdatedAt(assessor.availability?.last_updated)}
               href={`/assessor/${assessor.id}`}
+              isDemo={assessor.is_demo}
             />
           ))}
         </div>

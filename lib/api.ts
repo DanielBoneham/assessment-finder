@@ -21,6 +21,7 @@ export interface Assessor {
   assessment_types: string[]
   tier: 'free' | 'featured'
   is_verified: boolean
+  is_demo: boolean
   created_at: string
 }
 
@@ -69,6 +70,7 @@ export function fastestAvailability(assessors: AssessorWithAvailability[]): stri
 function normalise(raw: any[]): AssessorWithAvailability[] {
   return raw.map((row) => ({
     ...row,
+    is_demo: row.is_demo ?? false,
     availability: Array.isArray(row.availability)
       ? (row.availability[0] ?? null)
       : null,
@@ -107,6 +109,7 @@ export async function getAssessorById(
   if (error) return null
   return {
     ...data,
+    is_demo: data.is_demo ?? false,
     availability: Array.isArray(data.availability)
       ? (data.availability[0] ?? null)
       : null,

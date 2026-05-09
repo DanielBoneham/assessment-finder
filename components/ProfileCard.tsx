@@ -15,20 +15,21 @@ interface ProfileCardProps {
   availability: AvailabilityRange
   updatedAt: string
   href?: string
+  isDemo?: boolean
 }
 
-function idToSeed(id: string): number {
+const FEMALE_FIRST_NAMES = ['sophie', 'lena', 'priya', 'amelia', 'rachel', 'sarah', 'daniella']
+
+function getPhotoUrl(id: string, name: string): string {
+  const first = name.split(' ')[0].toLowerCase().replace(/^(dr|mr|mrs|ms)\.?\s*/i, '')
+  const isFemale = FEMALE_FIRST_NAMES.some((n) => first.includes(n))
+  const gender = isFemale ? 'women' : 'men'
   let hash = 0
   for (let i = 0; i < id.length; i++) {
     hash = (hash << 5) - hash + id.charCodeAt(i)
     hash |= 0
   }
-  return Math.abs(hash) % 70 + 1
-}
-
-function getPhotoUrl(id: string): string {
-  const seed = idToSeed(id)
-  const gender = seed % 2 === 0 ? 'women' : 'men'
+  const seed = (Math.abs(hash) % 40) + 1
   return `https://randomuser.me/api/portraits/${gender}/${seed}.jpg`
 }
 
@@ -48,12 +49,20 @@ export function ProfileCard({
   availability,
   updatedAt,
   href,
+  isDemo = false,
 }: ProfileCardProps) {
-  const photoUrl = getPhotoUrl(id)
+  const photoUrl = getPhotoUrl(id, name)
   const av = AVAILABILITY_CONFIG[availability]
 
   return (
-    <div style={{ background: '#ffffff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div style={{ background: '#ffffff', borderRadius: '12px', border: '0.5px solid #d1dce8', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative' }}>
+
+      {/* Demo badge */}
+      {isDemo && (
+        <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#f3f4f6', color: '#9ca3af', fontSize: '10px', fontWeight: 600, padding: '2px 8px', borderRadius: '20px', letterSpacing: '0.4px', textTransform: 'uppercase' }}>
+          Demo
+        </div>
+      )}
 
       <div style={{ background: av.bg, borderRadius: '8px', padding: '12px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
@@ -86,7 +95,6 @@ export function ProfileCard({
           View profile
         </a>
       )}
-
     </div>
   )
 }

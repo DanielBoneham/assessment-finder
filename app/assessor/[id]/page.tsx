@@ -21,18 +21,18 @@ const AVAILABILITY_COLORS: Record<string, { bg: string; text: string; dot: strin
   '3-plus-months':  { bg: '#fee2e2', text: '#991b1b', dot: '#ef4444', border: '#fca5a5' },
 }
 
-function idToSeed(id: string): number {
+const FEMALE_FIRST_NAMES = ['sophie', 'lena', 'priya', 'amelia', 'rachel', 'sarah', 'daniella']
+
+function getPhotoUrl(id: string, name: string): string {
+  const first = name.split(' ')[0].toLowerCase().replace(/^(dr|mr|mrs|ms)\.?\s*/i, '')
+  const isFemale = FEMALE_FIRST_NAMES.some((n) => first.includes(n))
+  const gender = isFemale ? 'women' : 'men'
   let hash = 0
   for (let i = 0; i < id.length; i++) {
     hash = (hash << 5) - hash + id.charCodeAt(i)
     hash |= 0
   }
-  return Math.abs(hash) % 70 + 1
-}
-
-function getPhotoUrl(id: string): string {
-  const seed = idToSeed(id)
-  const gender = seed % 2 === 0 ? 'women' : 'men'
+  const seed = (Math.abs(hash) % 40) + 1
   return `https://randomuser.me/api/portraits/${gender}/${seed}.jpg`
 }
 
@@ -62,8 +62,9 @@ export default async function AssessorProfilePage({ params }: Props) {
   const avColor = AVAILABILITY_COLORS[avKey]
   const updatedAt = formatUpdatedAt(av?.last_updated)
   const nextDate = av?.next_available_date ? formatDate(av.next_available_date) : null
-  const photoUrl = assessor.photo_url || getPhotoUrl(id)
-  const firstName = assessor.name.split(' ')[0]
+  const photoUrl = assessor.photo_url || getPhotoUrl(id, assessor.name)
+  const firstName = assessor.name.split(' ').find((p) => !['dr', 'mr', 'mrs', 'ms'].includes(p.toLowerCase())) ?? assessor.name.split(' ')[0]
+  const isDemo = (assessor as any).is_demo === true
 
   const personSchema = {
     '@context': 'https://schema.org',
@@ -91,7 +92,14 @@ export default async function AssessorProfilePage({ params }: Props) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
               <img src={photoUrl} alt={assessor.name} style={{ width: '88px', height: '88px', borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.2)', flexShrink: 0 }} />
               <div>
-                <h1 style={{ color: '#fff', fontSize: '26px', fontWeight: 500, margin: '0 0 4px' }}>{assessor.name}</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                  <h1 style={{ color: '#fff', fontSize: '26px', fontWeight: 500, margin: 0 }}>{assessor.name}</h1>
+                  {isDemo && (
+                    <span style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.5)', fontSize: '10px', fontWeight: 600, padding: '3px 9px', borderRadius: '20px', letterSpacing: '0.5px', textTransform: 'uppercase', flexShrink: 0 }}>
+                      Demo
+                    </span>
+                  )}
+                </div>
                 <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', margin: '0 0 12px' }}>{assessor.professional_title} · {assessor.location_city}</p>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {assessor.is_verified && (
@@ -154,6 +162,16 @@ export default async function AssessorProfilePage({ params }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)', gap: '24px', alignItems: 'start' }}>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+              {/* Demo notice */}
+              {isDemo && (
+                <div style={{ background: '#f9fafb', borderRadius: '12px', border: '0.5px solid #e5e7eb', padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '14px' }}>ℹ️</span>
+                  <p style={{ fontSize: '13px', color: '#6b7280', margin: 0, lineHeight: 1.5 }}>
+                    This is a demo profile created to illustrate how Assessment Finder works. Contact details and availability are for demonstration purposes only.
+                  </p>
+                </div>
+              )}
 
               {/* Verification */}
               <div style={{ background: '#f0fdf4', borderRadius: '12px', border: '1px solid #86efac', padding: '1.25rem 1.5rem', display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
